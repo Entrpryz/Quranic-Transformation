@@ -59,44 +59,44 @@ const LessonDetail: React.FC<LessonDetailProps> = ({
         className="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 transition-opacity animate-in fade-in duration-300"
         onClick={onClose}
       />
-      <div className="fixed inset-x-0 bottom-0 z-50 transform transition-transform animate-in slide-in-from-bottom duration-300 bg-white rounded-t-[3rem] shadow-[0_-20px_60px_rgba(5,150,105,0.3)] overflow-hidden max-h-[92vh] flex flex-col border border-emerald-200">
+      <div className="fixed inset-x-0 bottom-0 z-50 transform transition-transform animate-in slide-in-from-bottom duration-300 bg-white rounded-t-[2rem] shadow-[0_-20px_60px_rgba(5,150,105,0.3)] overflow-hidden max-h-[92vh] flex flex-col border border-emerald-200">
         {/* Handle Bar */}
         <div className="flex justify-center pt-4 pb-2" onClick={onClose}>
-          <div className="w-20 h-2 bg-emerald-300 rounded-full"></div>
+          <div className="w-16 h-1 bg-emerald-300 rounded-full"></div>
         </div>
 
         <div className="flex-1 overflow-y-auto p-6 pb-safe">
           {/* Header */}
-          <div className="flex justify-between items-start mb-8">
+          <div className="flex justify-between items-start mb-6">
             <div className="flex-1">
               <span
-                className={`px-4 py-2 rounded-xl text-sm font-bold uppercase tracking-wider border ${theme.badge}`}
+                className={`px-3 py-1 rounded-lg text-xs font-bold uppercase tracking-wider border ${theme.badge}`}
               >
                 {lesson.part}
               </span>
-              <h2 className="text-4xl font-display font-bold text-slate-800 mt-4 leading-tight tracking-tight">
+              <h2 className="text-2xl font-bold text-slate-800 mt-3 leading-tight">
                 {lesson.topicName}
               </h2>
-              <p className="text-lg text-emerald-700 font-medium mt-2">
+              <p className="text-base text-emerald-700 font-medium mt-1">
                 {lesson.surahReference}
               </p>
             </div>
             <button
               onClick={onClose}
-              className="p-3 bg-emerald-50 rounded-full text-emerald-600 hover:bg-red-500/20 border border-emerald-200 focus:ring-2 focus:ring-emerald-500/50 transition-all duration-300 ml-4"
+              className="p-2 bg-emerald-50 rounded-xl text-emerald-600 hover:bg-red-500/20 border border-emerald-200 focus:ring-2 focus:ring-emerald-500/50 transition-all duration-200 ml-4"
             >
-              <X size={28} />
+              <X size={20} />
             </button>
           </div>
 
           {/* Meta Info */}
-          <div className="flex items-center gap-8 mb-8 text-lg font-semibold text-emerald-700 border-b border-emerald-200 pb-6">
-            <div className="flex items-center gap-3">
-              <BookOpen size={22} className="text-emerald-600" />
+          <div className="flex items-center gap-6 mb-6 text-base font-semibold text-emerald-700 border-b border-emerald-200 pb-4">
+            <div className="flex items-center gap-2">
+              <BookOpen size={18} className="text-emerald-600" />
               <span>{lesson.surahName}</span>
             </div>
-            <div className="flex items-center gap-3">
-              <Clock size={22} className="text-emerald-600" />
+            <div className="flex items-center gap-2">
+              <Clock size={18} className="text-emerald-600" />
               <span>{lesson.hours} Hours</span>
             </div>
           </div>
@@ -104,9 +104,9 @@ const LessonDetail: React.FC<LessonDetailProps> = ({
           {/* Tags */}
           {lesson.tags && lesson.tags.length > 0 && (
             <div className="mb-6">
-              <div className="flex items-center gap-2 mb-3">
-                <Tag size={18} className="text-emerald-600" />
-                <span className="text-sm font-bold text-emerald-700 uppercase tracking-wider">
+              <div className="flex items-center gap-2 mb-2">
+                <Tag size={16} className="text-emerald-600" />
+                <span className="text-xs font-bold text-emerald-700 uppercase tracking-wider">
                   Topics
                 </span>
               </div>
@@ -114,7 +114,7 @@ const LessonDetail: React.FC<LessonDetailProps> = ({
                 {lesson.tags.map((tag, index) => (
                   <span
                     key={index}
-                    className="px-3 py-1 bg-emerald-50 text-emerald-700 rounded-full text-sm font-medium border border-emerald-200"
+                    className="px-2 py-1 bg-emerald-50 text-emerald-700 rounded-lg text-sm font-medium border border-emerald-200"
                   >
                     {tag}
                   </span>
@@ -124,30 +124,30 @@ const LessonDetail: React.FC<LessonDetailProps> = ({
           )}
 
           {/* Detailed Description */}
-          <div className="mb-8">
-            <div className="bg-emerald-50 p-6 rounded-2xl border border-emerald-200">
-              <p className="text-slate-700 leading-relaxed text-lg font-medium">
+          <div className="mb-6">
+            <div className="bg-emerald-50 p-4 rounded-xl border border-emerald-200">
+              <p className="text-slate-700 leading-relaxed text-base">
                 {lesson.detailedDescription}
               </p>
             </div>
           </div>
 
           {/* Urdu Title & Desc */}
-          <div className="space-y-8 mb-12">
+          <div className="space-y-6 mb-8">
             <div className="text-right">
-              <p className="text-sm font-bold text-emerald-700 uppercase tracking-widest mb-3">
+              <p className="text-xs font-bold text-emerald-700 uppercase tracking-widest mb-2">
                 Urdu Title
               </p>
-              <h3 className="font-urdu text-4xl text-emerald-800 leading-loose font-bold">
+              <h3 className="font-urdu text-2xl text-emerald-800 leading-loose font-bold">
                 {lesson.urduTitle}
               </h3>
             </div>
 
-            <div className="bg-slate-50 p-8 rounded-2xl border border-slate-200">
-              <p className="text-slate-700 leading-relaxed text-xl font-medium">
+            <div className="bg-slate-50 p-4 rounded-xl border border-slate-200">
+              <p className="text-slate-700 leading-relaxed text-base">
                 {lesson.description}
               </p>
-              <div className="mt-6 pt-6 border-t border-slate-200 flex justify-between text-sm font-bold text-emerald-700 uppercase tracking-wider">
+              <div className="mt-4 pt-4 border-t border-slate-200 flex justify-between text-xs font-bold text-emerald-700 uppercase tracking-wider">
                 <span>Verse Range</span>
                 <span>{lesson.verses}</span>
               </div>
@@ -155,51 +155,51 @@ const LessonDetail: React.FC<LessonDetailProps> = ({
           </div>
 
           {/* Action Grid */}
-          <div className="grid grid-cols-2 gap-4 pb-8">
+          <div className="grid grid-cols-2 gap-3 pb-6">
             <button
               onClick={onOpenNote}
-              className={`col-span-2 py-5 px-6 rounded-2xl font-display font-bold flex items-center justify-center gap-4 transition-all active:scale-95 shadow-lg border ${
+              className={`col-span-2 py-4 px-4 rounded-xl font-semibold flex items-center justify-center gap-3 transition-all active:scale-95 shadow-sm border ${
                 hasNote
                   ? "bg-amber-500/20 text-amber-700 border-amber-500/30"
                   : "bg-white text-emerald-700 border-emerald-200 hover:border-emerald-500/30 hover:text-emerald-800 focus:ring-2 focus:ring-emerald-500/50"
               }`}
             >
-              <Edit3 size={24} />
+              <Edit3 size={20} />
               {hasNote ? "Edit Reflection" : "Write Reflection"}
-              <span className="text-2xl"><Pencil size={24} /></span>
+              <Pencil size={16} />
             </button>
 
             {lesson.presentationLink ? (
               <>
                 <button
                   onClick={onOpenPdf}
-                  className="py-5 px-6 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-display font-bold flex flex-col items-center justify-center gap-3 shadow-2xl shadow-emerald-500/30 transition-transform active:scale-95 border border-transparent focus:ring-2 focus:ring-emerald-500/50"
+                  className="py-4 px-4 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-700 text-white font-semibold flex flex-col items-center justify-center gap-2 shadow-lg transition-transform active:scale-95 border border-transparent focus:ring-2 focus:ring-emerald-500/50"
                 >
-                  <FileText size={28} />
-                  <span className="text-lg">Read PDF</span>
+                  <FileText size={24} />
+                  <span className="text-sm">Read PDF</span>
                 </button>
                 <button
                   onClick={handleDownload}
-                  className={`py-5 px-6 rounded-2xl border font-display font-bold flex flex-col items-center justify-center gap-3 transition-transform active:scale-95 focus:ring-2 focus:ring-emerald-500/50 ${
+                  className={`py-4 px-4 rounded-xl border font-semibold flex flex-col items-center justify-center gap-2 transition-transform active:scale-95 focus:ring-2 focus:ring-emerald-500/50 ${
                     isDownloaded
                       ? "border-emerald-500/30 bg-emerald-500/20 text-emerald-700"
                       : "bg-white border-emerald-200 text-emerald-700 hover:border-emerald-500/30 hover:text-emerald-800"
                   }`}
                 >
                   {downloading ? (
-                    <div className="w-8 h-8 border-3 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
+                    <div className="w-6 h-6 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
                   ) : isDownloaded ? (
-                    <CheckCircle size={28} />
+                    <CheckCircle size={24} />
                   ) : (
-                    <Download size={28} />
+                    <Download size={24} />
                   )}
-                  <span className="text-lg">
+                  <span className="text-sm">
                     {isDownloaded ? "Saved" : "Download"}
                   </span>
                 </button>
               </>
             ) : (
-              <div className="col-span-2 p-6 text-center text-emerald-600 text-lg italic bg-emerald-50 rounded-2xl border border-emerald-200">
+              <div className="col-span-2 p-4 text-center text-emerald-600 text-base italic bg-emerald-50 rounded-xl border border-emerald-200">
                 No PDF Material Available
               </div>
             )}
