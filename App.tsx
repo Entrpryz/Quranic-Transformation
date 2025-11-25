@@ -79,38 +79,39 @@ const App = () => {
   }, [view, filterCategory, searchTerm, notes, downloadedIds]);
 
   return (
-    <div className="min-h-screen pb-32 bg-slate-50">
+    <div className="min-h-screen pb-32 bg-gradient-to-br from-slate-950 via-purple-950 to-slate-900">
+      {/* Animated Background */}
+      <div className="fixed inset-0 mesh-gradient pointer-events-none" />
+
       {/* Hero Header */}
-      <div className="bg-[#064E3B] text-white pt-safe pb-8 rounded-b-[2.5rem] shadow-2xl shadow-emerald-900/20 relative overflow-hidden">
-        {/* Background Decorative Pattern */}
-        <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
-        <div className="absolute bottom-0 left-0 w-48 h-48 bg-amber-500/10 rounded-full blur-2xl translate-y-1/2 -translate-x-1/4"></div>
+      <div className="relative pt-safe pb-8 rounded-b-[3rem] overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/20 via-purple-500/15 to-pink-500/10 backdrop-blur-3xl" />
 
         <div className="px-6 relative z-10 pt-4">
           {view === "home" ? (
             <div className="flex justify-between items-start mb-6">
               <div>
                 <div className="flex items-center gap-2 mb-2">
-                  <span className="bg-emerald-800/50 border border-emerald-700/50 text-emerald-200 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider flex items-center gap-1">
+                  <span className="glass-dark text-indigo-200 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider flex items-center gap-1">
                     <Sparkles size={14} /> v2.2
                   </span>
                 </div>
-                <h1 className="text-4xl font-bold text-white leading-tight">
+                <h1 className="text-5xl font-display font-bold text-white leading-tight tracking-tight">
                   Quranic
                   <br />
-                  <span className="text-emerald-200">Transformation</span>
+                  <span className="gradient-text">Transformation</span>
                 </h1>
               </div>
-              <div className="w-14 h-14 bg-emerald-800/50 rounded-2xl flex items-center justify-center border border-emerald-700/50 backdrop-blur-md">
-                <Book size={28} className="text-emerald-200" />
+              <div className="w-14 h-14 glass rounded-2xl flex items-center justify-center border border-white/10 backdrop-blur-md">
+                <Book size={28} className="text-indigo-300" />
               </div>
             </div>
           ) : (
             <div className="mb-6 pt-2">
-              <h1 className="text-4xl font-bold text-white">
+              <h1 className="text-4xl font-display font-bold text-white tracking-tight">
                 {view === "notes" ? "Reflections" : "Offline Library"}
               </h1>
-              <p className="text-emerald-200 text-lg mt-2 opacity-90">
+              <p className="text-indigo-200 text-lg mt-2 opacity-90">
                 {view === "notes"
                   ? "Your personal thoughts"
                   : "Available without internet"}
@@ -121,7 +122,7 @@ const App = () => {
           {/* Search Bar */}
           <div className="relative">
             <Search
-              className="absolute left-4 top-4 text-emerald-800"
+              className="absolute left-4 top-4 text-indigo-300"
               size={24}
             />
             <input
@@ -129,7 +130,7 @@ const App = () => {
               placeholder={
                 view === "notes" ? "Search your notes..." : "Find a lesson..."
               }
-              className="w-full bg-white border-2 border-emerald-700 rounded-2xl py-4 pl-12 pr-4 text-emerald-900 text-lg font-semibold placeholder:text-emerald-800/70 focus:outline-none focus:ring-4 focus:ring-emerald-500/50 shadow-lg shadow-emerald-900/10"
+              className="w-full glass border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-white text-lg font-semibold placeholder:text-indigo-200/70 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/30 transition-all duration-300 backdrop-blur-xl"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -149,10 +150,10 @@ const App = () => {
                 <button
                   key={cat}
                   onClick={() => setFilterCategory(cat)}
-                  className={`whitespace-nowrap px-5 py-3 rounded-2xl text-base font-bold uppercase tracking-wide transition-all duration-300 backdrop-blur-md min-h-[52px] ${
+                  className={`whitespace-nowrap px-5 py-3 rounded-2xl text-base font-bold uppercase tracking-wide transition-all duration-300 backdrop-blur-md min-h-[52px] border ${
                     isActive
-                      ? "bg-emerald-900 text-white shadow-lg shadow-emerald-900/20 scale-105 border-2 border-emerald-900"
-                      : "bg-white/80 text-emerald-900 border-2 border-white hover:bg-white hover:border-emerald-300"
+                      ? "bg-gradient-to-r from-indigo-500 to-purple-500 text-white shadow-lg shadow-indigo-500/30 scale-105 border-transparent"
+                      : "glass text-indigo-200 border-white/10 hover:border-indigo-500/30 hover:scale-[1.02]"
                   }`}
                 >
                   {cat}
@@ -164,13 +165,13 @@ const App = () => {
 
         {filteredData.length === 0 ? (
           <div className="text-center py-20 opacity-80">
-            <div className="w-24 h-24 bg-emerald-100 rounded-full mx-auto mb-6 flex items-center justify-center text-emerald-400 border-2 border-emerald-200">
+            <div className="w-24 h-24 glass rounded-full mx-auto mb-6 flex items-center justify-center text-indigo-400 border border-white/10">
               {view === "notes" ? <FileText size={40} /> : <Search size={40} />}
             </div>
-            <p className="font-bold text-2xl text-emerald-800 mb-2">
+            <p className="font-display font-bold text-2xl text-white mb-2 tracking-tight">
               Nothing found.
             </p>
-            <p className="text-lg text-emerald-600">
+            <p className="text-lg text-indigo-200">
               Try a different search term.
             </p>
           </div>
@@ -231,24 +232,24 @@ const App = () => {
 
       {/* PDF Viewer */}
       {activePdfLesson && (
-        <div className="fixed inset-0 z-50 bg-[#064E3B] flex flex-col animate-in fade-in duration-300">
-          <div className="flex items-center justify-between px-6 py-5 bg-[#064E3B] text-white border-b-2 border-emerald-700">
-            <h3 className="font-bold text-xl truncate pr-6">
+        <div className="fixed inset-0 z-50 bg-slate-950 flex flex-col animate-in fade-in duration-300">
+          <div className="flex items-center justify-between px-6 py-5 glass-dark border-b border-white/10">
+            <h3 className="font-display font-bold text-xl truncate pr-6 text-white tracking-tight">
               {activePdfLesson.title}
             </h3>
             <div className="flex gap-3">
               <a
                 href={getDownloadUrl(activePdfLesson.pdfLink)}
-                className="p-3 bg-white/10 rounded-full hover:bg-white/20 border-2 border-white/20"
+                className="p-3 glass rounded-full hover:bg-indigo-500/20 border border-white/10 transition-all duration-300"
                 target="_blank"
               >
-                <Download size={24} />
+                <Download size={24} className="text-indigo-300" />
               </a>
               <button
                 onClick={() => setActivePdfLesson(null)}
-                className="p-3 bg-white/10 rounded-full hover:bg-red-500/80 transition-colors border-2 border-white/20"
+                className="p-3 glass rounded-full hover:bg-red-500/20 border border-white/10 transition-all duration-300"
               >
-                <X size={24} />
+                <X size={24} className="text-red-300" />
               </button>
             </div>
           </div>
