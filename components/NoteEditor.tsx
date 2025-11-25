@@ -130,8 +130,8 @@ const NoteEditor: React.FC<NoteEditorProps> = ({
             <p style="font-size: 14px; color: #6B7280; margin: 0; font-weight: 500;">${lesson.surahReference} • Qur'anic Transformation</p>
           </div>
           <div style="text-align: right; padding-left: 20px;">
-             <div style="font-size: 12px; color: #9CA3AF; text-transform: uppercase; letter-spacing: 1px; font-weight: 700;">Reflection Note</div>
-             <div style="font-size: 12px; color: #6B7280; margin-top: 4px;">${dateStr}</div>
+              <div style="font-size: 12px; color: #9CA3AF; text-transform: uppercase; letter-spacing: 1px; font-weight: 700;">Reflection Note</div>
+              <div style="font-size: 12px; color: #6B7280; margin-top: 4px;">${dateStr}</div>
           </div>
         </div>
       `;
@@ -421,8 +421,8 @@ const NoteEditor: React.FC<NoteEditorProps> = ({
           <textarea
             ref={textareaRef}
             dir={isUrdu ? "rtl" : "ltr"}
-            className={`w-full h-full p-6 resize-none focus:outline-none bg-transparent text-slate-700 leading-relaxed text-xl border border-transparent focus:border-emerald-500/30 focus:ring-2 focus:ring-emerald-500/50 ${
-              isUrdu ? "font-urdu text-2xl" : "font-sans text-lg"
+            className={`w-full h-full p-6 resize-none focus:outline-none bg-transparent text-slate-700 leading-relaxed border border-transparent focus:border-emerald-500/30 focus:ring-2 focus:ring-emerald-500/50 ${
+              isUrdu ? "font-urdu text-xl" : "font-sans text-base"
             }`}
             placeholder={
               isUrdu
