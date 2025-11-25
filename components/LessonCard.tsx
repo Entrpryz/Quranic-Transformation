@@ -1,10 +1,5 @@
 import React from "react";
-import {
-  BookOpen,
-  ChevronRight,
-  CheckCircle,
-  StickyNote,
-} from "lucide-react";
+import { BookOpen, ChevronRight, CheckCircle, StickyNote } from "lucide-react";
 import { Lesson, getCategoryTheme } from "../constants";
 
 interface LessonCardProps {
@@ -25,12 +20,12 @@ const LessonCard: React.FC<LessonCardProps> = ({
   return (
     <button
       onClick={onClick}
-      className="group relative w-full text-left bg-white rounded-3xl p-2 mb-5 shadow-lg hover:shadow-2xl hover:shadow-emerald-900/10 transition-all duration-300 ease-out active:scale-[0.98] border-2 border-slate-100 focus:ring-4 focus:ring-emerald-500/30"
+      className="group relative w-full text-left glass rounded-3xl p-2 mb-5 border border-white/10 hover:border-indigo-500/30 shadow-lg hover:shadow-2xl hover:shadow-indigo-500/10 transition-all duration-300 ease-out active:scale-[0.98] focus:ring-2 focus:ring-indigo-500/50 backdrop-blur-xl"
     >
-      <div className="flex items-center gap-5 p-5 rounded-2xl bg-gradient-to-br from-white to-slate-50 border border-slate-200">
-        {/* Gradient Icon Box */}
+      <div className="flex items-center gap-5 p-5 rounded-2xl bg-white/5 border border-white/5">
+        {/* Glass Icon Box */}
         <div
-          className={`w-16 h-16 rounded-2xl flex items-center justify-center text-2xl font-bold font-serif text-white shadow-lg bg-gradient-to-br ${theme.gradient} ${theme.shadow} shrink-0 border-2 border-white`}
+          className={`w-16 h-16 rounded-2xl flex items-center justify-center text-2xl font-bold font-display text-white shadow-lg backdrop-blur-md border border-white/10 ${theme.gradient}`}
         >
           {lesson.id}
         </div>
@@ -39,22 +34,22 @@ const LessonCard: React.FC<LessonCardProps> = ({
           {/* Top Label */}
           <div className="flex items-center gap-2 mb-2">
             <span
-              className={`text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-lg border-2 ${theme.badge} border-emerald-200`}
+              className={`text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-lg border ${theme.badge} border-indigo-500/20 backdrop-blur-sm`}
             >
               {lesson.part}
             </span>
           </div>
 
-          <h3 className="text-xl font-bold text-slate-900 leading-tight mb-2 truncate pr-2 font-serif">
+          <h3 className="text-xl font-display font-bold text-white leading-tight mb-2 truncate pr-2 tracking-tight">
             {lesson.title}
           </h3>
 
-          <div className="flex items-center gap-4 text-sm text-slate-600 font-semibold">
+          <div className="flex items-center gap-4 text-sm text-indigo-200 font-semibold">
             <span className="flex items-center gap-2">
               <BookOpen size={16} className={theme.icon} />
               {lesson.surahName}
             </span>
-            <span className="w-2 h-2 rounded-full bg-slate-400"></span>
+            <span className="w-2 h-2 rounded-full bg-indigo-500/30"></span>
             <span>{lesson.hours} hours</span>
 
             {(hasNote || isDownloaded) && (
@@ -62,13 +57,13 @@ const LessonCard: React.FC<LessonCardProps> = ({
                 {hasNote && (
                   <StickyNote
                     size={18}
-                    className="text-amber-600 fill-amber-600"
+                    className="text-amber-400 fill-amber-400/20"
                   />
                 )}
                 {isDownloaded && (
                   <CheckCircle
                     size={18}
-                    className="text-emerald-600 fill-emerald-600"
+                    className="text-emerald-400 fill-emerald-400/20"
                   />
                 )}
               </div>
@@ -76,7 +71,7 @@ const LessonCard: React.FC<LessonCardProps> = ({
           </div>
         </div>
 
-        <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-slate-400 shadow-sm border-2 border-slate-100 group-hover:text-emerald-600 group-hover:border-emerald-200 transition-colors">
+        <div className="w-10 h-10 rounded-full glass flex items-center justify-center text-indigo-300 border border-white/10 group-hover:text-indigo-200 group-hover:border-indigo-500/30 transition-all duration-300">
           <ChevronRight size={20} />
         </div>
       </div>
