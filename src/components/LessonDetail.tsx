@@ -62,10 +62,10 @@ const LessonDetail: React.FC<LessonDetailProps> = ({
   return (
     <>
       <div
-        className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[60] animate-in fade-in duration-200"
+        className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-60 animate-in fade-in duration-200"
         onClick={onClose}
       />
-      <div className="fixed inset-x-0 bottom-0 z-[70] animate-in slide-in-from-bottom duration-300 bg-white rounded-t-[2rem] shadow-2xl overflow-hidden max-h-[90vh] flex flex-col border-t border-white/20">
+      <div className="fixed inset-x-0 bottom-0 z-70 animate-in slide-in-from-bottom duration-300 bg-white rounded-t-4xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col border-t border-white/20">
         {/* Header */}
         <div
           className="flex justify-center pt-3 pb-1 cursor-pointer"
@@ -153,7 +153,7 @@ const LessonDetail: React.FC<LessonDetailProps> = ({
               <>
                 <button
                   onClick={onOpenPdf}
-                  className="py-3.5 px-4 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-700 text-white font-semibold flex flex-col items-center justify-center gap-1 shadow-lg shadow-emerald-500/20 active:scale-[0.98]"
+                  className="py-3.5 px-4 rounded-xl bg-linear-to-r from-emerald-600 to-teal-700 text-white font-semibold flex flex-col items-center justify-center gap-1 shadow-lg shadow-emerald-500/20 active:scale-[0.98]"
                 >
                   <FileText size={20} />
                   <span className="text-xs">Read PDF</span>
