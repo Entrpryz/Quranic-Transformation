@@ -14,8 +14,8 @@ const BottomNav: React.FC<BottomNavProps> = ({ activeView, onChangeView }) => {
   ];
 
   return (
-    <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 w-auto">
-      <div className="flex items-center gap-2 bg-white backdrop-blur-xl border border-emerald-200 shadow-2xl shadow-emerald-500/10 rounded-2xl px-4 py-3">
+    <div className="fixed bottom-0 left-0 right-0 z-40 bg-white/80 backdrop-blur-md border-t border-emerald-200 pt-2 pb-safe">
+      <div className="flex items-center justify-around px-2 max-w-md mx-auto">
         {navItems.map((item) => {
           const isActive = activeView === item.id;
           const Icon = item.icon;
@@ -24,16 +24,35 @@ const BottomNav: React.FC<BottomNavProps> = ({ activeView, onChangeView }) => {
             <button
               key={item.id}
               onClick={() => onChangeView(item.id)}
-              className={`relative flex items-center justify-center gap-3 min-h-[60px] min-w-[100px] px-4 rounded-xl transition-all duration-300 border ${
+              className={`relative flex flex-col items-center justify-center gap-1 py-2 px-4 rounded-xl transition-all duration-200 flex-1 max-w-[100px] ${
                 isActive
-                  ? "bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-lg shadow-emerald-500/30 scale-105 border-transparent"
-                  : "text-emerald-600 hover:text-emerald-700 bg-white border-emerald-200 hover:border-emerald-500/30 focus:ring-2 focus:ring-emerald-500/50"
+                  ? "text-emerald-600 bg-emerald-50"
+                  : "text-slate-600 hover:text-emerald-600"
               }`}
             >
-              <Icon size={24} strokeWidth={isActive ? 2.5 : 2} />
-              <span className="text-base font-bold font-display tracking-tight">
+              <div
+                className={`p-2 rounded-lg transition-all ${
+                  isActive ? "bg-emerald-100" : "bg-transparent"
+                }`}
+              >
+                <Icon
+                  size={20}
+                  strokeWidth={isActive ? 2.5 : 2}
+                  className={isActive ? "text-emerald-600" : "text-slate-500"}
+                />
+              </div>
+              <span
+                className={`text-xs font-semibold transition-all ${
+                  isActive ? "text-emerald-600" : "text-slate-500"
+                }`}
+              >
                 {item.label}
               </span>
+
+              {/* Active indicator */}
+              {isActive && (
+                <div className="absolute top-0 w-1 h-1 bg-emerald-500 rounded-full" />
+              )}
             </button>
           );
         })}
