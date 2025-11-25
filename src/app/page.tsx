@@ -103,9 +103,9 @@ export default function Home() {
   const downloadsCount = downloadedIds.size;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-emerald-50 pb-20">
+    <div className="min-h-screen bg-linear-to-br from-slate-50 to-emerald-50 pb-20">
       {/* --- HEADER SECTION (Fixed/Sticky) --- */}
-      <div className="sticky top-0 z-40 bg-gradient-to-r from-emerald-600 to-teal-700 shadow-lg">
+      <div className="sticky top-0 z-40 bg-linear-to-r from-emerald-600 to-teal-700 shadow-lg">
         <div className="px-6 py-4">
           <div className="flex justify-between items-center mb-4">
             <button
@@ -155,7 +155,7 @@ export default function Home() {
       <main className="px-4 pt-4 relative z-10">
         {/* Banner (Only on Home) */}
         {view === "home" && !searchTerm && (
-          <div className="mb-6 p-6 rounded-2xl bg-gradient-to-br from-emerald-600 to-teal-800 text-white shadow-lg relative overflow-hidden">
+          <div className="mb-6 p-6 rounded-2xl bg-linear-to-br from-emerald-600 to-teal-800 text-white shadow-lg relative overflow-hidden">
             <div className="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-white/10 rounded-full blur-xl"></div>
             <div className="flex items-center gap-2 mb-2">
               <span className="bg-white/20 text-white text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider flex items-center gap-1">
