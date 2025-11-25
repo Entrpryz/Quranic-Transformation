@@ -10,7 +10,7 @@ interface PdfViewerProps {
 
 const PdfViewer: React.FC<PdfViewerProps> = ({ lesson, onClose }) => {
   return (
-    <div className="fixed inset-0 z-[80] bg-white flex flex-col animate-in slide-in-from-bottom duration-200">
+    <div className="fixed inset-0 z-80 bg-white flex flex-col animate-in slide-in-from-bottom duration-200">
       <div className="flex items-center justify-between px-4 py-3 bg-slate-900 text-white border-b border-slate-800">
         <h3 className="font-bold text-sm truncate pr-4 text-slate-200">
           {lesson.topicName}
