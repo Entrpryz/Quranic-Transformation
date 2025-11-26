@@ -29,12 +29,12 @@ const BottomNav: React.FC<BottomNavProps> = ({ activeView, onChangeView }) => {
     <>
       {/* Spacer to prevent content overlap */}
       <div
-        className="h-28 w-full opacity-0 pointer-events-none"
+        className="h-28 w-full opacity-0 pointer-events-none lg:hidden"
         aria-hidden="true"
       />
 
-      {/* Main Navigation Container */}
-      <div className="fixed bottom-0 left-0 right-0 z-50 w-full">
+      {/* Main Navigation Container - Hidden on desktop */}
+      <div className="fixed bottom-0 left-0 right-0 z-50 w-full lg:hidden">
         {/* Enhanced Separator with gradient */}
         <Separator className="bg-linear-to-r from-transparent via-emerald-200/40 to-transparent h-px" />
 
