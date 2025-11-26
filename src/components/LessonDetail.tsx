@@ -8,7 +8,6 @@ import {
   Edit3,
   FileText,
   CheckCircle,
-  Pencil,
   Bookmark,
   Share2,
 } from "lucide-react";
@@ -70,7 +69,7 @@ const LessonDetail: React.FC<LessonDetailProps> = ({
     <Dialog open={true} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-md p-0 gap-0 bg-white/95 backdrop-blur-sm border-0 rounded-2xl shadow-2xl overflow-hidden">
         {/* Header with gradient background */}
-        <DialogHeader className="p-6 pb-4 space-y-4 bg-gradient-to-br from-emerald-50 via-teal-50 to-slate-50 border-b border-slate-200/60">
+        <DialogHeader className="p-6 pb-4 space-y-4 bg-linear-to-br from-emerald-50 via-teal-50 to-slate-50 border-b border-slate-200/60">
           <div className="flex justify-between items-start">
             <div className="space-y-3 flex-1">
               <div className="flex items-center gap-2">
@@ -136,7 +135,7 @@ const LessonDetail: React.FC<LessonDetailProps> = ({
               <span className="text-xs font-semibold text-emerald-600 uppercase tracking-wider">
                 Urdu Title
               </span>
-              <div className="h-px flex-1 bg-gradient-to-r from-emerald-100 to-transparent ml-3"></div>
+              <div className="h-px flex-1 bg-linear-to-r from-emerald-100 to-transparent ml-3"></div>
             </div>
             
             <Card className="bg-emerald-50/30 border-emerald-100 shadow-sm">
@@ -149,7 +148,7 @@ const LessonDetail: React.FC<LessonDetailProps> = ({
           </div>
 
           {/* Lesson Details Card */}
-          <Card className="border-teal-100 bg-gradient-to-br from-teal-50/40 to-emerald-50/40 shadow-sm">
+          <Card className="border-teal-100 bg-linear-to-br from-teal-50/40 to-emerald-50/40 shadow-sm">
             <CardContent className="p-4 space-y-3">
               <p className="text-sm text-slate-700 leading-relaxed">
                 {lesson.description}
@@ -196,7 +195,7 @@ const LessonDetail: React.FC<LessonDetailProps> = ({
               <>
                 <Button
                   onClick={onOpenPdf}
-                  className="h-12 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white gap-2 shadow-lg shadow-emerald-500/25 transition-all"
+                  className="h-12 rounded-xl bg-linear-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white gap-2 shadow-lg shadow-emerald-500/25 transition-all"
                 >
                   <FileText className="h-4 w-4" />
                   Read PDF
