@@ -1,8 +1,17 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/set-state-in-effect */
 "use client";
 
 import React, { useState, useEffect, useMemo } from "react";
-import { Search, Menu, Sparkles, FileText } from "lucide-react";
+import {
+  Search,
+  Menu,
+  Sparkles,
+  FileText,
+  BookOpen,
+  Download,
+  StickyNote,
+} from "lucide-react";
 import {
   SYLLABUS_DATA,
   CATEGORIES,
@@ -19,6 +28,13 @@ import NoteEditor from "@/components/NoteEditor";
 import Sidebar from "@/components/Sidebar";
 import PdfViewer from "@/components/PdfViewer";
 
+// Shadcn UI Components
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+
 export default function Home() {
   // --- State Management ---
   const [view, setView] = useState<"home" | "notes" | "downloads">("home");
@@ -29,10 +45,7 @@ export default function Home() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   // --- "Return to Topic" Logic ---
-  // We track the 'active' lesson in the modal.
   const [selectedLesson, setSelectedLesson] = useState<Lesson | null>(null);
-
-  // These states layer ON TOP of the selectedLesson, preserving the "parent" view.
   const [isEditingNote, setIsEditingNote] = useState(false);
   const [isViewingPdf, setIsViewingPdf] = useState(false);
 
@@ -103,27 +116,29 @@ export default function Home() {
   const downloadsCount = downloadedIds.size;
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-slate-50 to-emerald-50 pb-20">
-      {/* --- HEADER SECTION (Fixed/Sticky) --- */}
-      <div className="sticky top-0 z-40 bg-linear-to-r from-emerald-600 to-teal-700 shadow-lg">
-        <div className="px-6 py-4">
-          <div className="flex justify-between items-center mb-4">
-            <button
+    <div className="min-h-screen bg-slate-50 pb-20">
+      {/* --- HEADER SECTION (Modern Islamic Design) --- */}
+      <div className="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-slate-200 shadow-sm">
+        <div className="px-4 py-3">
+          <div className="flex justify-between items-center mb-3">
+            <Button
+              variant="outline"
+              size="icon"
               onClick={() => setSidebarOpen(true)}
-              className="p-2 bg-white/20 rounded-xl text-white hover:bg-white/30 border border-white/20 backdrop-blur-sm transition-all duration-200"
+              className="h-10 w-10 rounded-xl border-slate-200 bg-white/80 hover:bg-white hover:scale-[1.02] transition-all duration-200"
             >
-              <Menu size={24} />
-            </button>
+              <Menu className="h-4 w-4 text-emerald-700" />
+            </Button>
 
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-white/20 p-1 border border-white/20 flex items-center justify-center font-bold text-white">
-                QT
+            <div className="flex items-center gap-2">
+              <div className="w-9 h-9 rounded-xl bg-emerald-600 p-1 flex items-center justify-center font-bold text-white shadow-sm">
+                <BookOpen className="h-4 w-4" />
               </div>
               <div className="text-right">
-                <div className="text-white/80 text-xs font-medium">
+                <div className="text-slate-600 text-xs font-medium">
                   Welcome to
                 </div>
-                <div className="text-white font-bold text-sm">
+                <div className="text-emerald-700 font-bold text-sm leading-tight">
                   Quranic Transform
                 </div>
               </div>
@@ -133,62 +148,109 @@ export default function Home() {
           {/* Search Bar */}
           <div className="relative">
             <Search
-              className="absolute left-4 top-3.5 text-emerald-600"
+              className="absolute left-3 top-3 text-emerald-600"
               size={18}
             />
-            <input
+            <Input
               type="text"
               placeholder={
                 view === "notes"
                   ? "Search your reflections..."
                   : "Search topics, surahs..."
               }
-              className="w-full bg-white/95 border border-emerald-200 rounded-xl py-2.5 pl-10 pr-4 text-slate-800 placeholder-emerald-600/70 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 shadow-sm text-sm"
+              className="w-full bg-white border-slate-200 rounded-xl pl-10 pr-4 py-2 text-slate-800 placeholder-emerald-600/70 focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-300 transition-all duration-200 shadow-sm"
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={(e: { target: { value: React.SetStateAction<string>; }; }) => setSearchTerm(e.target.value)}
             />
           </div>
         </div>
       </div>
 
       {/* --- MAIN CONTENT LIST --- */}
-      <main className="px-4 pt-4 relative z-10">
+      <main className="px-4 pt-4 relative z-10 max-w-md mx-auto">
+        {/* Stats & View Toggle */}
+        <div className="mb-4">
+          <Tabs
+            value={view}
+            onValueChange={(v: any) => {
+              setView(v);
+              setFilterCategory("All");
+              setSearchTerm("");
+              window.scrollTo(0, 0);
+            }}
+            className="w-full"
+          >
+            <TabsList className="grid w-full grid-cols-3 rounded-xl bg-slate-100/80 p-1">
+              <TabsTrigger
+                value="home"
+                className="rounded-lg data-[state=active]:bg-white data-[state=active]:text-emerald-700 data-[state=active]:shadow-sm transition-all duration-200"
+              >
+                <Sparkles className="h-3 w-3 mr-1" />
+                Topics
+              </TabsTrigger>
+              <TabsTrigger
+                value="notes"
+                className="rounded-lg data-[state=active]:bg-white data-[state=active]:text-emerald-700 data-[state=active]:shadow-sm transition-all duration-200"
+              >
+                <StickyNote className="h-3 w-3 mr-1" />
+                Notes {savedNotesCount > 0 && `(${savedNotesCount})`}
+              </TabsTrigger>
+              <TabsTrigger
+                value="downloads"
+                className="rounded-lg data-[state=active]:bg-white data-[state=active]:text-emerald-700 data-[state=active]:shadow-sm transition-all duration-200"
+              >
+                <Download className="h-3 w-3 mr-1" />
+                Downloads {downloadsCount > 0 && `(${downloadsCount})`}
+              </TabsTrigger>
+            </TabsList>
+          </Tabs>
+        </div>
+
         {/* Banner (Only on Home) */}
         {view === "home" && !searchTerm && (
-          <div className="mb-6 p-6 rounded-2xl bg-linear-to-br from-emerald-600 to-teal-800 text-white shadow-lg relative overflow-hidden">
-            <div className="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-white/10 rounded-full blur-xl"></div>
-            <div className="flex items-center gap-2 mb-2">
-              <span className="bg-white/20 text-white text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider flex items-center gap-1">
-                <Sparkles size={10} /> v3.0
-              </span>
-            </div>
-            <h1 className="text-2xl font-bold leading-tight mb-1">
-              Quranic Transformation
-            </h1>
-            <p className="text-emerald-100 text-sm opacity-90">
-              Journey through divine wisdom
-            </p>
-          </div>
+          <Card className="mb-6 border-emerald-200 bg-gradient-to-br from-emerald-50 to-teal-50 shadow-sm hover:shadow-md transition-all duration-300">
+            <CardHeader className="pb-3">
+              <div className="flex items-center gap-2 mb-2">
+                <Badge
+                  variant="secondary"
+                  className="bg-emerald-600 text-white text-xs px-2 py-0 rounded-full"
+                >
+                  <Sparkles className="h-3 w-3 mr-1" /> v3.0
+                </Badge>
+              </div>
+              <CardTitle className="text-xl text-emerald-800 leading-tight">
+                Quranic Transformation
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-emerald-700/80 text-sm leading-relaxed">
+                Journey through divine wisdom with reflective insights and
+                spiritual growth
+              </p>
+            </CardContent>
+          </Card>
         )}
 
         {/* Categories (Home only) */}
         {view === "home" && (
-          <div className="flex gap-2 overflow-x-auto no-scrollbar pb-4">
+          <div className="flex gap-2 overflow-x-auto pb-4 scrollbar-hide">
             {CATEGORIES.map((cat) => {
               const theme = getCategoryTheme(cat);
               const isActive = filterCategory === cat;
               return (
-                <button
+                <Button
                   key={cat}
+                  variant={isActive ? "default" : "outline"}
+                  size="sm"
                   onClick={() => setFilterCategory(cat)}
-                  className={`whitespace-nowrap px-4 py-1.5 rounded-full text-xs font-semibold transition-all duration-300 border ${
+                  className={`whitespace-nowrap rounded-full transition-all duration-300 ${
                     isActive
-                      ? `${theme.accent} text-white border-emerald-600 shadow-md`
-                      : "bg-white text-emerald-700 border-emerald-200"
+                      ? "bg-emerald-600 text-white shadow-sm hover:bg-emerald-700 hover:scale-[1.02]"
+                      : "bg-white text-emerald-700 border-slate-200 hover:bg-slate-50 hover:scale-[1.02]"
                   }`}
                 >
                   {cat === "All" ? "All Topics" : cat}
-                </button>
+                </Button>
               );
             })}
           </div>
@@ -196,24 +258,41 @@ export default function Home() {
 
         {/* Results */}
         {filteredData.length === 0 ? (
-          <div className="text-center py-16">
-            <div className="w-16 h-16 bg-white rounded-2xl mx-auto mb-4 flex items-center justify-center text-emerald-400 border border-emerald-200 shadow-sm">
-              {view === "notes" ? <FileText size={24} /> : <Search size={24} />}
-            </div>
-            <p className="font-bold text-lg text-slate-800 mb-2">
-              {searchTerm ? "No results found" : "Nothing here yet"}
-            </p>
-          </div>
+          <Card className="text-center py-16 border-slate-200 bg-white/90 shadow-sm">
+            <CardContent>
+              <div className="w-16 h-16 bg-slate-100 rounded-2xl mx-auto mb-4 flex items-center justify-center text-emerald-500 border border-slate-200">
+                {view === "notes" ? (
+                  <FileText size={24} />
+                ) : (
+                  <Search size={24} />
+                )}
+              </div>
+              <p className="font-semibold text-lg text-slate-800 mb-2">
+                {searchTerm ? "No results found" : "Nothing here yet"}
+              </p>
+              <p className="text-slate-600 text-sm">
+                {view === "notes"
+                  ? "Start taking notes on topics to see them here"
+                  : view === "downloads"
+                  ? "Download topics to access them offline"
+                  : "Try searching for different terms"}
+              </p>
+            </CardContent>
+          </Card>
         ) : (
-          <div className="space-y-3 pb-safe">
+          <div className="space-y-4 pb-safe">
             {filteredData.map((lesson) => (
-              <LessonCard
+              <div
                 key={lesson.id}
-                lesson={lesson}
-                hasNote={!!notes[lesson.id]?.content}
-                isDownloaded={downloadedIds.has(lesson.id)}
-                onClick={() => setSelectedLesson(lesson)}
-              />
+                className="transform transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
+              >
+                <LessonCard
+                  lesson={lesson}
+                  hasNote={!!notes[lesson.id]?.content}
+                  isDownloaded={downloadedIds.has(lesson.id)}
+                  onClick={() => setSelectedLesson(lesson)}
+                />
+              </div>
             ))}
           </div>
         )}
@@ -261,7 +340,7 @@ export default function Home() {
           lesson={selectedLesson}
           initialContent={notes[selectedLesson.id]?.content || ""}
           initialIsUrdu={notes[selectedLesson.id]?.isUrdu || false}
-          onClose={() => setIsEditingNote(false)} // Returns to Detail View
+          onClose={() => setIsEditingNote(false)}
           onSave={(content, isUrdu) =>
             handleSaveNote(selectedLesson.id, content, isUrdu)
           }
@@ -272,7 +351,7 @@ export default function Home() {
       {selectedLesson && isViewingPdf && (
         <PdfViewer
           lesson={selectedLesson}
-          onClose={() => setIsViewingPdf(false)} // Returns to Detail View
+          onClose={() => setIsViewingPdf(false)}
         />
       )}
     </div>
