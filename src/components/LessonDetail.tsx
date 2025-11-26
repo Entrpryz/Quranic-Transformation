@@ -1,29 +1,10 @@
 "use client";
-import React, { useState } from "react";
-import {
-  X,
-  Clock,
-  BookOpen,
-  Download,
-  Edit3,
-  FileText,
-  CheckCircle,
-  Bookmark,
-  Share2,
-} from "lucide-react";
-import { Lesson, getCategoryTheme, getDownloadUrl } from "@/lib/constants";
-import { Gulzar } from "next/font/google";
-import { Dialog, DialogContent, DialogHeader } from "@/components/ui/dialog";
+import React from "react";
+import { X, Clock, Download, FileText, CheckCircle2 } from "lucide-react";
+import { Lesson } from "@/lib/constants";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
-
-const gulzar = Gulzar({
-  weight: "400",
-  subsets: ["arabic"],
-  display: "swap",
-});
 
 interface LessonDetailProps {
   lesson: Lesson;
@@ -44,212 +25,75 @@ const LessonDetail: React.FC<LessonDetailProps> = ({
   onDownload,
   onOpenPdf,
 }) => {
-  const theme = getCategoryTheme(lesson.part);
-  const [downloading, setDownloading] = useState(false);
-
-  const handleDownload = () => {
-    if (isDownloaded || downloading) return;
-    setDownloading(true);
-
-    const link = document.createElement("a");
-    link.href = getDownloadUrl(lesson.presentationLink);
-    link.target = "_blank";
-    link.rel = "noopener noreferrer";
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-
-    setTimeout(() => {
-      onDownload();
-      setDownloading(false);
-    }, 1500);
-  };
-
   return (
     <Dialog open={true} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md p-0 gap-0 bg-white/95 backdrop-blur-sm border-0 rounded-2xl shadow-2xl overflow-hidden lg:max-w-2xl">
-        {/* Header with gradient background */}
-        <DialogHeader className="p-6 pb-4 space-y-4 bg-linear-to-br from-emerald-50 via-teal-50 to-slate-50 border-b border-slate-200/60 lg:p-8">
-          <div className="flex justify-between items-start">
-            <div className="space-y-3 flex-1">
-              <div className="flex items-center gap-2">
-                <Badge
-                  variant="secondary"
-                  className={`px-3 py-1 text-xs font-semibold uppercase tracking-wider ${theme.badge} border-0`}
-                >
-                  {lesson.part}
-                </Badge>
-                <div className="h-1 w-1 rounded-full bg-slate-300"></div>
-                <span className="text-xs font-medium text-slate-500 flex items-center gap-1">
-                  <Clock className="h-3 w-3" />
-                  {lesson.hours}h
-                </span>
-              </div>
-
-              <h2 className="text-xl font-bold text-slate-900 leading-tight pr-12 lg:text-2xl lg:pr-0">
-                {lesson.topicName}
-              </h2>
-            </div>
-
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={onClose}
-              className="h-9 w-9 rounded-xl bg-white/80 backdrop-blur-sm border border-slate-200/60 hover:bg-white hover:border-slate-300 transition-all"
-            >
-              <X className="h-4 w-4" />
-            </Button>
-          </div>
-
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 text-sm font-medium text-emerald-700 bg-white/60 px-3 py-1.5 rounded-lg border border-emerald-100 lg:text-base">
-              <BookOpen className="h-4 w-4" />
+      <DialogContent className="bg-zinc-900 border-zinc-800 text-zinc-100 max-w-2xl p-0 gap-0 overflow-hidden">
+        {/* Header */}
+        <div className="p-6 border-b border-zinc-800 flex justify-between items-start bg-zinc-900/50">
+          <div className="space-y-2">
+            <Badge className="bg-emerald-500/10 text-emerald-400 border-emerald-500/20 hover:bg-emerald-500/20">
+              {lesson.part}
+            </Badge>
+            <h2 className="text-xl font-bold leading-tight">
+              {lesson.topicName}
+            </h2>
+            <div className="flex items-center gap-2 text-sm text-zinc-500">
+              <Clock size={14} /> <span>{lesson.hours}h</span>
+              <span>•</span>
               <span>{lesson.surahName}</span>
             </div>
-
-            <div className="flex gap-1">
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8 rounded-lg"
-              >
-                <Bookmark className="h-4 w-4" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8 rounded-lg"
-              >
-                <Share2 className="h-4 w-4" />
-              </Button>
-            </div>
           </div>
-        </DialogHeader>
+          <button onClick={onClose} className="text-zinc-500 hover:text-white">
+            <X />
+          </button>
+        </div>
 
-        {/* Content */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-6 max-h-[60vh] lg:max-h-[70vh] lg:p-8">
-          {/* Description Card */}
-          <Card className="border-slate-200/60 bg-slate-50/50 shadow-sm">
-            <CardContent className="p-4 lg:p-6">
-              <p className="text-sm text-slate-700 leading-relaxed lg:text-base">
-                {lesson.detailedDescription}
-              </p>
-            </CardContent>
-          </Card>
-
-          {/* Urdu Title Section */}
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold text-emerald-600 uppercase tracking-wider lg:text-sm">
-                Urdu Title
-              </span>
-              <div className="h-px flex-1 bg-linear-to-r from-emerald-100 to-transparent ml-3"></div>
-            </div>
-
-            <Card className="bg-emerald-50/30 border-emerald-100 shadow-sm">
-              <CardContent className="p-4 lg:p-6">
-                <h3
-                  className={`${gulzar.className} text-2xl text-emerald-800 leading-loose text-right font-normal lg:text-3xl`}
-                >
-                  {lesson.urduTitle}
-                </h3>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Lesson Details Card */}
-          <Card className="border-teal-100 bg-linear-to-br from-teal-50/40 to-emerald-50/40 shadow-sm">
-            <CardContent className="p-4 space-y-3 lg:p-6">
-              <p className="text-sm text-slate-700 leading-relaxed lg:text-base">
-                {lesson.description}
-              </p>
-
-              <div className="flex items-center justify-between pt-3 border-t border-teal-100/50">
-                <span className="text-xs font-semibold text-teal-700 uppercase tracking-wider lg:text-sm">
-                  Verses
-                </span>
-                <Badge
-                  variant="outline"
-                  className="text-teal-700 border-teal-200 bg-white/60 lg:text-sm"
-                >
-                  {lesson.verses}
-                </Badge>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Progress Section */}
-          <div className="space-y-2">
-            <div className="flex justify-between text-xs text-slate-500 lg:text-sm">
-              <span>Lesson Progress</span>
-              <span>25%</span>
-            </div>
-            <Progress value={25} className="h-2 bg-slate-200/60" />
+        {/* Body */}
+        <div className="p-6 space-y-6 max-h-[60vh] overflow-y-auto">
+          <div className="bg-zinc-950/50 p-6 rounded-xl border border-zinc-800/50">
+            <h3 className="font-gulzar text-3xl text-right text-emerald-400 mb-4">
+              {lesson.urduTitle}
+            </h3>
+            <p className="text-zinc-300 leading-relaxed text-sm md:text-base">
+              {lesson.detailedDescription || lesson.description}
+            </p>
           </div>
         </div>
 
-        {/* Action Buttons */}
-        <div className="p-6 pt-4 border-t border-slate-200/60 bg-white/80 backdrop-blur-sm lg:p-8">
-          <div className="grid grid-cols-2 gap-3 lg:grid-cols-4 lg:gap-4">
+        {/* Footer Actions */}
+        <div className="p-6 bg-zinc-950 border-t border-zinc-800 flex flex-col sm:flex-row gap-3">
+          <Button
+            onClick={onOpenNote}
+            className="flex-1 bg-amber-600 hover:bg-amber-700 text-white"
+          >
+            {hasNote ? "Edit Reflection" : "Add Reflection"}
+          </Button>
+
+          {lesson.presentationLink && (
             <Button
-              onClick={onOpenNote}
-              variant={hasNote ? "default" : "outline"}
-              className={`h-12 rounded-xl gap-2 transition-all lg:col-span-2 ${
-                hasNote
-                  ? "bg-amber-500 hover:bg-amber-600 text-white border-amber-500 shadow-lg shadow-amber-500/25"
-                  : "border-slate-300 hover:border-emerald-300 hover:bg-emerald-50/50"
-              }`}
+              onClick={onOpenPdf}
+              variant="outline"
+              className="flex-1 border-zinc-700 text-zinc-200 hover:bg-zinc-800 hover:text-white"
             >
-              <Edit3 className="h-4 w-4" />
-              {hasNote ? "Edit Notes" : "Take Notes"}
+              <FileText className="mr-2 h-4 w-4" /> View PDF
             </Button>
+          )}
 
-            {lesson.presentationLink ? (
-              <>
-                <Button
-                  onClick={onOpenPdf}
-                  className="h-12 rounded-xl bg-linear-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white gap-2 shadow-lg shadow-emerald-500/25 transition-all lg:col-span-2"
-                >
-                  <FileText className="h-4 w-4" />
-                  Read PDF
-                </Button>
-
-                <Button
-                  onClick={handleDownload}
-                  variant={isDownloaded ? "secondary" : "outline"}
-                  disabled={downloading}
-                  className="h-12 rounded-xl gap-2 col-span-2 transition-all border-slate-300 hover:border-emerald-300 lg:col-span-4"
-                >
-                  {downloading ? (
-                    <>
-                      <div className="h-4 w-4 border-2 border-emerald-600 border-t-transparent rounded-full animate-spin" />
-                      <span>Downloading...</span>
-                    </>
-                  ) : isDownloaded ? (
-                    <>
-                      <CheckCircle className="h-4 w-4 text-emerald-600" />
-                      <span className="text-emerald-700">
-                        Downloaded Successfully
-                      </span>
-                    </>
-                  ) : (
-                    <>
-                      <Download className="h-4 w-4" />
-                      <span>Download Material</span>
-                    </>
-                  )}
-                </Button>
-              </>
-            ) : (
-              <Card className="col-span-2 border-slate-200/60 bg-slate-50/50 lg:col-span-4">
-                <CardContent className="p-4 text-center">
-                  <p className="text-sm text-slate-500">
-                    No PDF material available for this lesson
-                  </p>
-                </CardContent>
-              </Card>
-            )}
-          </div>
+          {lesson.presentationLink && (
+            <Button
+              onClick={onDownload}
+              variant={isDownloaded ? "secondary" : "outline"}
+              className="flex-1 border-zinc-700 text-zinc-200"
+              disabled={isDownloaded}
+            >
+              {isDownloaded ? (
+                <CheckCircle2 className="mr-2 h-4 w-4 text-emerald-500" />
+              ) : (
+                <Download className="mr-2 h-4 w-4" />
+              )}
+              {isDownloaded ? "Saved" : "Download"}
+            </Button>
+          )}
         </div>
       </DialogContent>
     </Dialog>
