@@ -6,18 +6,17 @@ import {
   ChevronRight,
   CheckCircle2,
   StickyNote,
-  PlayCircle,
+  Clock,
+  FileText,
 } from "lucide-react";
 import { Lesson, getCategoryTheme } from "@/lib/constants";
 import { Gulzar } from "next/font/google";
 
 // Shadcn UI Imports
-import { Button } from "@/components/ui/button"; // Imported Button Component
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
-
 
 const gulzar = Gulzar({
   weight: "400",
@@ -25,7 +24,6 @@ const gulzar = Gulzar({
   display: "swap",
   variable: "--font-gulzar",
 });
-
 
 interface LessonCardProps {
   lesson: Lesson;
@@ -40,133 +38,139 @@ const LessonCard: React.FC<LessonCardProps> = ({
   isDownloaded,
   onClick,
 }) => {
-  // Retrieve dynamic colors based on the category (Part)
   const theme = getCategoryTheme(lesson.part);
 
   return (
-    <Button
-      variant="ghost"
-      onClick={onClick}
+    <Card
       className={cn(
-        "group h-auto w-full p-0 mb-3 rounded-xl",
-        "justify-start whitespace-normal font-normal", // Reset text alignment and wrapping
-        "hover:bg-transparent" // Disable default ghost hover bg to let Card handle it
+        "group w-full p-0 mb-4 rounded-2xl cursor-pointer transition-all duration-300 ease-out",
+        "bg-white/90 backdrop-blur-sm border border-slate-200/80 shadow-sm",
+        "hover:shadow-lg hover:shadow-emerald-100/50 hover:border-emerald-200/60",
+        "hover:scale-[1.02] active:scale-[0.99]"
       )}
+      onClick={onClick}
     >
-      <Card
-        className={cn(
-          "relative w-full overflow-hidden border-slate-200 text-left transition-all duration-300 ease-out",
-          "bg-white/95 backdrop-blur-sm",
-          "hover:border-emerald-300/50 hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:bg-white",
-          "group-hover:scale-[1.02] group-active:scale-[0.98]"
-        )}
-      >
-        {/* Decorative "Book Spine" using absolute positioning */}
+      <CardContent className="p-0">
+        {/* Header with Gradient Background */}
         <div
           className={cn(
-            "absolute left-0 top-0 bottom-0 w-1.5 opacity-80 transition-opacity group-hover:opacity-100",
-            theme.gradient
+            "relative px-6 py-4 rounded-t-2xl",
+            "bg-linear-to-r from-slate-50 to-emerald-50/70",
+            "border-b border-slate-200/60"
           )}
-        />
-
-        <CardContent className="flex items-start gap-4 p-4 pl-5">
-          {/* Left Column: ID & Icon */}
-          <div className="flex flex-col items-center gap-2 pt-1">
-            <div
-              className={cn(
-                "flex h-10 w-10 items-center justify-center rounded-full border shadow-sm transition-colors",
-                "bg-slate-50 border-slate-100 text-slate-500",
-                "group-hover:border-emerald-200 group-hover:text-emerald-600"
-              )}
-            >
-              <span className="text-sm font-bold">{lesson.id}</span>
-            </div>
-          </div>
-
-          {/* Middle Column: Content */}
-          <div className="flex-1 min-w-0">
-            {/* Header: Badge & English Title */}
-            <div className="flex flex-wrap items-center gap-2 mb-2">
-              <Badge
-                variant="outline"
+        >
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              {/* Lesson ID with Islamic geometric pattern inspiration */}
+              <div
                 className={cn(
-                  "rounded-full px-2.5 py-0.5 text-[10px] font-bold border-opacity-40",
-                  theme.badge
+                  "flex h-12 w-12 items-center justify-center rounded-xl",
+                  "bg-white border border-slate-200 shadow-sm",
+                  "transition-all duration-300 group-hover:shadow-md",
+                  theme.gradient
+                )}
+              >
+                <span className="text-sm font-bold text-white">
+                  {lesson.id}
+                </span>
+              </div>
+
+              {/* Part Badge */}
+              <Badge
+                className={cn(
+                  "rounded-full px-3 py-1 text-xs font-semibold border-0 shadow-sm",
+                  "bg-emerald-600 text-white hover:bg-emerald-700",
+                  "transition-colors duration-300"
                 )}
               >
                 {lesson.part}
               </Badge>
-              <h3 className="text-xs font-medium text-slate-500 uppercase tracking-wide truncate">
-                {lesson.topicName}
-              </h3>
             </div>
 
-            {/* Core: Urdu Title */}
-            <div
-              className={cn(
-                gulzar.className,
-                "text-xl sm:text-2xl text-slate-800 transition-colors leading-[2.2] text-right w-full pr-1",
-                "group-hover:text-emerald-800"
+            {/* Status Indicators */}
+            <div className="flex items-center gap-2">
+              {hasNote && (
+                <div className="p-2 rounded-lg bg-amber-50 border border-amber-200/60">
+                  <StickyNote
+                    size={16}
+                    className="text-amber-600 fill-amber-600/20"
+                  />
+                </div>
               )}
-              dir="rtl"
-            >
-              {lesson.urduTitle}
-            </div>
-
-            {/* Footer Section */}
-            <Separator className="my-3 bg-slate-100" />
-
-            <div className="flex items-center justify-between">
-              {/* Meta Info */}
-              <div className="flex items-center gap-3 text-xs text-slate-400 font-medium">
-                <span className="flex items-center gap-1.5 transition-colors group-hover:text-emerald-600">
-                  <BookOpen size={13} className="text-emerald-500/70" />
-                  {lesson.surahName}
-                </span>
-
-                <span className="h-1 w-1 rounded-full bg-slate-200" />
-
-                <span className="flex items-center gap-1">
-                  <PlayCircle size={13} className="text-slate-300" />
-                  {lesson.hours}h
-                </span>
-              </div>
-
-              {/* Status Indicators (Notes/Downloads) */}
-              <div className="flex items-center gap-2">
-                {(hasNote || isDownloaded) && (
-                  <Badge
-                    variant="secondary"
-                    className="flex items-center gap-1.5 bg-slate-50 hover:bg-slate-100 px-2 py-1 h-auto font-normal border-slate-100"
-                  >
-                    {hasNote && (
-                      <StickyNote
-                        size={14}
-                        className="text-amber-500 fill-amber-500/10"
-                      />
-                    )}
-                    {isDownloaded && (
-                      <CheckCircle2
-                        size={14}
-                        className="text-emerald-500 fill-emerald-500/10"
-                      />
-                    )}
-                  </Badge>
-                )}
-              </div>
+              {isDownloaded && (
+                <div className="p-2 rounded-lg bg-emerald-50 border border-emerald-200/60">
+                  <CheckCircle2
+                    size={16}
+                    className="text-emerald-600 fill-emerald-600/20"
+                  />
+                </div>
+              )}
             </div>
           </div>
+        </div>
 
-          {/* Right Column: Chevron */}
-          <div className="flex h-full items-center pl-1 self-center">
-            <ChevronRight
-              size={18}
-              className="text-slate-300 transition-all group-hover:text-emerald-500 group-hover:translate-x-0.5"
-            />
+        {/* Main Content */}
+        <div className="p-6">
+          {/* English Title */}
+          <div className="flex items-center gap-2 mb-3">
+            <FileText size={14} className="text-slate-400" />
+            <h3 className="text-sm font-medium text-slate-600 uppercase tracking-wide truncate">
+              {lesson.topicName}
+            </h3>
           </div>
-        </CardContent>
-      </Card>
-    </Button>
+
+          {/* Urdu Title - Centerpiece */}
+          <div
+            className={cn(
+              gulzar.className,
+              "relative py-6 px-4 mb-4 rounded-xl",
+              "bg-slate-50/80 border border-slate-200/60",
+              "text-2xl text-emerald-800 leading-[2.2] text-right",
+              "transition-all duration-300",
+              "group-hover:bg-white group-hover:border-emerald-200/40",
+              "group-hover:text-emerald-900 group-hover:shadow-inner"
+            )}
+            dir="rtl"
+          >
+            {lesson.urduTitle}
+            
+            {/* Decorative corner elements */}
+            <div className="absolute top-2 left-2 w-2 h-2 border-l border-t border-emerald-300/60 rounded-tl"></div>
+            <div className="absolute top-2 right-2 w-2 h-2 border-r border-t border-emerald-300/60 rounded-tr"></div>
+            <div className="absolute bottom-2 left-2 w-2 h-2 border-l border-b border-emerald-300/60 rounded-bl"></div>
+            <div className="absolute bottom-2 right-2 w-2 h-2 border-r border-b border-emerald-300/60 rounded-br"></div>
+          </div>
+
+          <Separator className="bg-slate-200/60 mb-4" />
+
+          {/* Footer Meta Info */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4 text-sm text-slate-500">
+              {/* Surah Name */}
+              <div className="flex items-center gap-2 transition-colors group-hover:text-emerald-700">
+                <BookOpen size={16} className="text-emerald-500" />
+                <span className="font-medium">{lesson.surahName}</span>
+              </div>
+
+              {/* Duration */}
+              <div className="flex items-center gap-2 transition-colors group-hover:text-slate-600">
+                <Clock size={16} className="text-slate-400" />
+                <span className="font-medium">{lesson.hours}h</span>
+              </div>
+            </div>
+
+            {/* Action Indicator */}
+            <div className="flex items-center gap-2 text-slate-400 transition-colors group-hover:text-emerald-600">
+              <span className="text-sm font-medium">View</span>
+              <ChevronRight
+                size={18}
+                className="transition-transform group-hover:translate-x-0.5"
+              />
+            </div>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
   );
 };
 
