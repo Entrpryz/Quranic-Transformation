@@ -28,15 +28,15 @@ const LessonCard: React.FC<LessonCardProps> = ({
         "hover:border-emerald-500/50 hover:shadow-lg hover:shadow-emerald-900/20 hover:-translate-y-1"
       )}
     >
-      {/* Top Row */}
-      <div className="flex justify-between items-start mb-4">
+      {/* Top Row: ID, Badge, Indicators */}
+      <div className="flex justify-between items-start mb-3">
         <div className="flex items-center gap-2">
-          <span className="text-xs font-mono text-zinc-500">
+          <span className="text-xs font-mono text-zinc-600 group-hover:text-zinc-500 transition-colors">
             #{lesson.id.toString().padStart(3, "0")}
           </span>
           <Badge
             variant="outline"
-            className="text-[10px] h-5 border-zinc-700 text-zinc-400"
+            className="text-[10px] h-5 px-1.5 border-zinc-800 text-zinc-400 bg-zinc-900/50"
           >
             {lesson.part}
           </Badge>
@@ -50,31 +50,32 @@ const LessonCard: React.FC<LessonCardProps> = ({
       </div>
 
       {/* Content */}
-      <div className="space-y-3">
-        {/* Urdu Title - Right Aligned & Prominent */}
-        <h3 className="font-gulzar text-2xl text-right text-emerald-400 leading-relaxed group-hover:text-emerald-300 transition-colors">
+      <div className="space-y-3 flex-1">
+        {/* Urdu Title - Explicitly using Gulzar font */}
+        <h3 className="font-gulzar text-2xl text-right text-emerald-400 leading-normal group-hover:text-emerald-300 transition-colors mt-1">
           {lesson.urduTitle}
         </h3>
 
         {/* English Title */}
-        <h4 className="font-medium text-zinc-100 text-lg leading-tight line-clamp-2">
+        <h4 className="font-medium text-zinc-100 text-lg leading-snug line-clamp-2">
           {lesson.topicName}
         </h4>
 
-        <p className="text-sm text-zinc-400 line-clamp-2">
+        <p className="text-sm text-zinc-400 line-clamp-2 leading-relaxed">
           {lesson.description}
         </p>
       </div>
 
       {/* Footer */}
-      <div className="mt-6 pt-4 border-t border-zinc-800 flex items-center justify-between">
+      <div className="mt-5 pt-4 border-t border-zinc-800/60 flex items-center justify-between">
         <div className="flex items-center gap-2 text-xs text-zinc-500">
           <Clock className="w-3 h-3" />
           <span>{lesson.hours}h</span>
           <span>•</span>
-          <span>{lesson.surahName}</span>
+          <span className="truncate max-w-[100px]">{lesson.surahName}</span>
         </div>
-        <div className="w-8 h-8 rounded-full bg-zinc-900 flex items-center justify-center border border-zinc-800 group-hover:bg-emerald-500 group-hover:text-white group-hover:border-emerald-500 transition-all">
+
+        <div className="w-8 h-8 rounded-full bg-zinc-900 flex items-center justify-center border border-zinc-800 text-zinc-500 group-hover:bg-emerald-500 group-hover:text-white group-hover:border-emerald-500 transition-all">
           <ArrowUpRight className="w-4 h-4" />
         </div>
       </div>
