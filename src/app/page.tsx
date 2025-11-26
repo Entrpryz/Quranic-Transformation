@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/set-state-in-effect */
 "use client";
@@ -208,7 +209,7 @@ export default function Home() {
 
         {/* Banner (Only on Home) */}
         {view === "home" && !searchTerm && (
-          <Card className="mb-6 border-emerald-200 bg-gradient-to-br from-emerald-50 to-teal-50 shadow-sm hover:shadow-md transition-all duration-300">
+          <Card className="mb-6 border-emerald-200 bg-linear-to-br from-emerald-50 to-teal-50 shadow-sm hover:shadow-md transition-all duration-300">
             <CardHeader className="pb-3">
               <div className="flex items-center gap-2 mb-2">
                 <Badge
