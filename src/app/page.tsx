@@ -2,7 +2,7 @@
 "use client";
 
 import React, { useState, useEffect, useMemo } from "react";
-import { Menu, Search, Filter } from "lucide-react";
+import { Menu, Search, Filter, BookOpen } from "lucide-react";
 import { SYLLABUS_DATA, CATEGORIES, Note, Lesson } from "@/lib/constants";
 
 // Components
@@ -18,30 +18,33 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
 export default function Home() {
-  // --- State ---
+  // --- Core State ---
   const [view, setView] = useState<"home" | "notes" | "downloads">("home");
   const [filterCategory, setFilterCategory] = useState("All");
   const [searchTerm, setSearchTerm] = useState("");
+
+  // --- Data State ---
   const [notes, setNotes] = useState<Record<number, Note>>({});
   const [downloadedIds, setDownloadedIds] = useState<Set<number>>(new Set());
+  const [isClient, setIsClient] = useState(false);
 
-  // Sidebar State
+  // --- UI State ---
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
-
-  // Modals
   const [selectedLesson, setSelectedLesson] = useState<Lesson | null>(null);
   const [isEditingNote, setIsEditingNote] = useState(false);
   const [isViewingPdf, setIsViewingPdf] = useState(false);
 
-  // --- Persistence ---
+  // --- Persistence & Initialization ---
   useEffect(() => {
+    setIsClient(true);
     try {
       const savedNotes = localStorage.getItem("qt_notes_v3");
       if (savedNotes) setNotes(JSON.parse(savedNotes));
+
       const savedDownloads = localStorage.getItem("qt_downloads");
       if (savedDownloads) setDownloadedIds(new Set(JSON.parse(savedDownloads)));
     } catch (e) {
-      console.error("Failed to load data:", e);
+      console.error("Data load error:", e);
     }
   }, []);
 
@@ -58,8 +61,6 @@ export default function Home() {
     localStorage.setItem("qt_notes_v3", JSON.stringify(updatedNotes));
   };
 
-  // This just updates the "Saved" status icon, the actual file download logic
-  // is now handled inside LessonDetail.tsx
   const handleDownloadStatusUpdate = (lessonId: number) => {
     const newSet = new Set(downloadedIds);
     newSet.add(lessonId);
@@ -67,24 +68,30 @@ export default function Home() {
     localStorage.setItem("qt_downloads", JSON.stringify(Array.from(newSet)));
   };
 
-  // --- Filtering ---
+  // --- Filtering Logic ---
   const filteredData = useMemo(() => {
     let data = SYLLABUS_DATA;
-    if (view === "notes")
+
+    // View Filtering
+    if (view === "notes") {
       data = data.filter((l) => notes[l.id]?.content?.trim().length > 0);
-    else if (view === "downloads")
+    } else if (view === "downloads") {
       data = data.filter((l) => downloadedIds.has(l.id));
+    }
 
-    if (view === "home" && filterCategory !== "All")
+    // Category Filtering (Only applies on Home view usually, but good to have)
+    if (view === "home" && filterCategory !== "All") {
       data = data.filter((l) => l.part === filterCategory);
+    }
 
+    // Search Filtering
     if (searchTerm) {
       const lower = searchTerm.toLowerCase();
       data = data.filter(
         (l) =>
           l.topicName.toLowerCase().includes(lower) ||
           l.surahName.toLowerCase().includes(lower) ||
-          l.description.toLowerCase().includes(lower)
+          l.urduTitle.includes(searchTerm) // Allow Urdu search
       );
     }
     return data;
@@ -94,69 +101,77 @@ export default function Home() {
     (n) => n.content.trim().length > 0
   ).length;
 
+  if (!isClient) return null; // Prevent hydration mismatch
+
   return (
     <>
-      {/* 1. Sidebar (Responsive) */}
+      {/* 1. Sidebar */}
       <Sidebar
         isOpen={mobileSidebarOpen}
         onClose={() => setMobileSidebarOpen(false)}
         activeView={view}
-        onChangeView={setView}
+        onChangeView={(v) => {
+          setView(v);
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        }}
         activeCategory={filterCategory}
         onSelectCategory={setFilterCategory}
         savedNotesCount={savedNotesCount}
         downloadsCount={downloadedIds.size}
       />
 
-      {/* 2. Main Content Area */}
-      <main className="flex-1 h-screen overflow-y-auto bg-background relative w-full">
-        {/* Header */}
-        <header className="sticky top-0 z-30 bg-background/80 backdrop-blur-md border-b border-border px-4 py-4 md:px-8">
+      {/* 2. Main Layout */}
+      <main className="flex-1 min-h-screen bg-background relative w-full lg:ml-0 transition-all duration-300">
+        {/* Sticky Header */}
+        <header className="sticky top-0 z-30 bg-background/80 backdrop-blur-xl border-b border-border px-4 py-3 md:px-8 md:py-4">
           <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
             <div className="flex items-center gap-3">
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={() => setMobileSidebarOpen(true)}
-                className="lg:hidden text-zinc-400 hover:text-white"
+                className="lg:hidden text-zinc-400 hover:text-white -ml-2"
               >
                 <Menu />
               </Button>
-              <h1 className="text-xl font-bold tracking-tight text-white hidden md:block">
+              <h1 className="text-lg md:text-xl font-bold tracking-tight text-white flex items-center gap-2">
+                {view === "home" && (
+                  <BookOpen className="w-5 h-5 text-emerald-500" />
+                )}
                 {view === "home"
                   ? "Syllabus"
                   : view === "notes"
                   ? "My Reflections"
-                  : "Downloads"}
+                  : "Offline Library"}
               </h1>
             </div>
 
-            {/* Search */}
-            <div className="relative flex-1 max-w-md">
+            {/* Search Bar */}
+            <div className="relative flex-1 max-w-sm md:max-w-md ml-auto">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500 h-4 w-4" />
               <Input
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder="Search topics, surahs..."
-                className="pl-9 bg-zinc-900/50 border-zinc-800 text-zinc-100 placeholder:text-zinc-600 focus:ring-1 focus:ring-emerald-500 rounded-full transition-all"
+                placeholder="Search..."
+                className="pl-9 h-9 md:h-10 bg-zinc-900/50 border-zinc-800 text-zinc-100 placeholder:text-zinc-600 focus-visible:ring-emerald-500 rounded-lg transition-all"
               />
             </div>
           </div>
 
-          {/* Mobile Category Pills (Horizontal Scroll) - Only on Home */}
+          {/* Mobile Category Pills */}
           {view === "home" && (
-            <div className="mt-4 flex gap-2 overflow-x-auto pb-2 no-scrollbar md:hidden">
+            <div className="mt-3 flex gap-2 overflow-x-auto pb-1 no-scrollbar lg:hidden mask-fade-right">
               {CATEGORIES.map((cat) => (
                 <button
                   key={cat}
                   onClick={() => setFilterCategory(cat)}
-                  className={`whitespace-nowrap px-4 py-1.5 rounded-full text-xs font-medium transition-colors ${
+                  className={`whitespace-nowrap px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
                     filterCategory === cat
-                      ? "bg-emerald-600 text-white"
+                      ? "bg-emerald-600 text-white shadow-lg shadow-emerald-900/20"
                       : "bg-zinc-900 border border-zinc-800 text-zinc-400"
                   }`}
                 >
-                  {cat === "All" ? "All" : cat}
+                  {cat === "All" ? "All Modules" : cat}
                 </button>
               ))}
             </div>
@@ -164,11 +179,16 @@ export default function Home() {
         </header>
 
         {/* Content Grid */}
-        <div className="max-w-7xl mx-auto px-4 py-6 md:px-8 pb-24 md:pb-8">
+        <div className="max-w-7xl mx-auto px-4 py-6 md:px-8 pb-24 md:pb-12">
           {filteredData.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-20 text-zinc-500">
-              <Filter className="h-12 w-12 mb-4 opacity-20" />
-              <p>No lessons found.</p>
+            <div className="flex flex-col items-center justify-center py-24 text-zinc-500 animate-in fade-in zoom-in-95 duration-300">
+              <div className="w-16 h-16 bg-zinc-900 rounded-full flex items-center justify-center mb-4">
+                <Filter className="h-8 w-8 opacity-40" />
+              </div>
+              <p className="text-lg font-medium">No lessons found</p>
+              <p className="text-sm opacity-60">
+                Try adjusting your search or filters
+              </p>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-6">
@@ -189,9 +209,9 @@ export default function Home() {
       {/* Mobile Bottom Nav */}
       <BottomNav activeView={view} onChangeView={setView} />
 
-      {/* --- Modals & Overlays --- */}
+      {/* --- Modals --- */}
 
-      {/* 1. Detail Modal */}
+      {/* Lesson Detail Overlay */}
       {selectedLesson && !isEditingNote && !isViewingPdf && (
         <LessonDetail
           lesson={selectedLesson}
@@ -204,7 +224,7 @@ export default function Home() {
         />
       )}
 
-      {/* 2. Note Editor */}
+      {/* Fullscreen Note Editor */}
       {selectedLesson && isEditingNote && (
         <NoteEditor
           lesson={selectedLesson}
@@ -217,7 +237,7 @@ export default function Home() {
         />
       )}
 
-      {/* 3. PDF Viewer */}
+      {/* Fullscreen PDF Viewer */}
       {selectedLesson && isViewingPdf && (
         <PdfViewer
           lesson={selectedLesson}
