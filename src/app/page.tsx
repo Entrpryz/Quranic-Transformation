@@ -1,59 +1,39 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/set-state-in-effect */
 "use client";
 
 import React, { useState, useEffect, useMemo } from "react";
-import {
-  Search,
-  Menu,
-  Sparkles,
-  FileText,
-  BookOpen,
-  Download,
-  StickyNote,
-  Grid3X3,
-  List,
-} from "lucide-react";
-import {
-  SYLLABUS_DATA,
-  CATEGORIES,
-  Note,
-  Lesson,
-  getCategoryTheme,
-} from "@/lib/constants";
+import { Menu, Search, Filter } from "lucide-react";
+import { SYLLABUS_DATA, CATEGORIES, Note, Lesson } from "@/lib/constants";
 
-// Component Imports
-import BottomNav from "@/components/BottomNav";
+// Components
 import LessonCard from "@/components/LessonCard";
 import LessonDetail from "@/components/LessonDetail";
 import NoteEditor from "@/components/NoteEditor";
 import Sidebar from "@/components/Sidebar";
 import PdfViewer from "@/components/PdfViewer";
+import BottomNav from "@/components/BottomNav";
 
-// Shadcn UI Components
+// UI
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default function Home() {
-  // --- State Management ---
+  // --- State ---
   const [view, setView] = useState<"home" | "notes" | "downloads">("home");
   const [filterCategory, setFilterCategory] = useState("All");
   const [searchTerm, setSearchTerm] = useState("");
   const [notes, setNotes] = useState<Record<number, Note>>({});
   const [downloadedIds, setDownloadedIds] = useState<Set<number>>(new Set());
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
 
-  // --- "Return to Topic" Logic ---
+  // Sidebar State
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+
+  // Modals
   const [selectedLesson, setSelectedLesson] = useState<Lesson | null>(null);
   const [isEditingNote, setIsEditingNote] = useState(false);
   const [isViewingPdf, setIsViewingPdf] = useState(false);
 
-  // --- Persistence Logic ---
+  // --- Persistence ---
   useEffect(() => {
     try {
       const savedNotes = localStorage.getItem("qt_notes_v3");
@@ -61,7 +41,7 @@ export default function Home() {
       const savedDownloads = localStorage.getItem("qt_downloads");
       if (savedDownloads) setDownloadedIds(new Set(JSON.parse(savedDownloads)));
     } catch (e) {
-      console.error("Failed to load saved data:", e);
+      console.error("Failed to load data:", e);
     }
   }, []);
 
@@ -85,14 +65,11 @@ export default function Home() {
     localStorage.setItem("qt_downloads", JSON.stringify(Array.from(newSet)));
   };
 
-  // --- Search & Filter Logic ---
+  // --- Filtering ---
   const filteredData = useMemo(() => {
     let data = SYLLABUS_DATA;
-
     if (view === "notes")
-      data = data.filter(
-        (l) => notes[l.id] && notes[l.id].content.trim().length > 0
-      );
+      data = data.filter((l) => notes[l.id]?.content?.trim().length > 0);
     else if (view === "downloads")
       data = data.filter((l) => downloadedIds.has(l.id));
 
@@ -104,11 +81,8 @@ export default function Home() {
       data = data.filter(
         (l) =>
           l.topicName.toLowerCase().includes(lower) ||
-          l.description.toLowerCase().includes(lower) ||
-          l.detailedDescription.toLowerCase().includes(lower) ||
-          l.surahReference.toLowerCase().includes(lower) ||
           l.surahName.toLowerCase().includes(lower) ||
-          l.tags.some((tag) => tag.toLowerCase().includes(lower))
+          l.description.toLowerCase().includes(lower)
       );
     }
     return data;
@@ -117,287 +91,103 @@ export default function Home() {
   const savedNotesCount = Object.values(notes).filter(
     (n) => n.content.trim().length > 0
   ).length;
-  const downloadsCount = downloadedIds.size;
 
   return (
-    <div className="min-h-screen bg-slate-50 pb-20 lg:pb-0">
-      {/* --- HEADER SECTION (Modern Islamic Design) --- */}
-      <div className="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-slate-200 shadow-sm">
-        <div className="px-4 py-3 lg:px-6 lg:py-4">
-          <div className="flex justify-between items-center mb-3">
-            <div className="flex items-center gap-4">
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={() => setSidebarOpen(true)}
-                className="h-10 w-10 rounded-xl border-slate-200 bg-white/80 hover:bg-white hover:scale-[1.02] transition-all duration-200 lg:hidden"
-              >
-                <Menu className="h-4 w-4 text-emerald-700" />
-              </Button>
-
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-emerald-600 p-2 flex items-center justify-center font-bold text-white shadow-sm">
-                  <BookOpen className="h-5 w-5" />
-                </div>
-                <div className="text-right">
-                  <div className="text-slate-600 text-xs font-medium lg:text-sm">
-                    Welcome to
-                  </div>
-                  <div className="text-emerald-700 font-bold text-sm leading-tight lg:text-lg">
-                    Quranic Transform
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Desktop Navigation */}
-            <div className="hidden lg:flex items-center gap-2">
-              {["home", "notes", "downloads"].map((tab) => (
-                <Button
-                  key={tab}
-                  variant={view === tab ? "default" : "ghost"}
-                  onClick={() => setView(tab as any)}
-                  className={`rounded-xl ${
-                    view === tab
-                      ? "bg-emerald-600 text-white"
-                      : "text-slate-600 hover:text-emerald-700"
-                  }`}
-                >
-                  {tab === "home" && <Sparkles className="h-4 w-4 mr-2" />}
-                  {tab === "notes" && <StickyNote className="h-4 w-4 mr-2" />}
-                  {tab === "downloads" && <Download className="h-4 w-4 mr-2" />}
-                  {tab.charAt(0).toUpperCase() + tab.slice(1)}
-                  {tab === "notes" && savedNotesCount > 0 && (
-                    <Badge
-                      variant="secondary"
-                      className="ml-2 bg-white text-emerald-700"
-                    >
-                      {savedNotesCount}
-                    </Badge>
-                  )}
-                  {tab === "downloads" && downloadsCount > 0 && (
-                    <Badge
-                      variant="secondary"
-                      className="ml-2 bg-white text-emerald-700"
-                    >
-                      {downloadsCount}
-                    </Badge>
-                  )}
-                </Button>
-              ))}
-            </div>
-          </div>
-
-          {/* Search Bar */}
-          <div className="relative">
-            <Search
-              className="absolute left-3 top-3 text-emerald-600"
-              size={18}
-            />
-            <Input
-              type="text"
-              placeholder={
-                view === "notes"
-                  ? "Search your reflections..."
-                  : "Search topics, surahs..."
-              }
-              className="w-full bg-white border-slate-200 rounded-xl pl-10 pr-4 py-2 text-slate-800 placeholder-emerald-600/70 focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-300 transition-all duration-200 shadow-sm lg:py-3"
-              value={searchTerm}
-              onChange={(e: {
-                target: { value: React.SetStateAction<string> };
-              }) => setSearchTerm(e.target.value)}
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* --- MAIN CONTENT LIST --- */}
-      <main className="px-4 pt-4 relative z-10 lg:px-6 lg:pt-6 lg:max-w-7xl mx-auto">
-        {/* Stats & View Toggle */}
-        <div className="mb-4 lg:flex lg:items-center lg:justify-between">
-          <Tabs
-            value={view}
-            onValueChange={(v: any) => {
-              setView(v);
-              setFilterCategory("All");
-              setSearchTerm("");
-              window.scrollTo(0, 0);
-            }}
-            className="w-full lg:w-auto"
-          >
-            <TabsList className="grid w-full grid-cols-3 rounded-xl bg-slate-100/80 p-1 lg:w-auto lg:inline-flex">
-              <TabsTrigger
-                value="home"
-                className="rounded-lg data-[state=active]:bg-white data-[state=active]:text-emerald-700 data-[state=active]:shadow-sm transition-all duration-200 lg:px-6"
-              >
-                <Sparkles className="h-3 w-3 mr-1 lg:mr-2" />
-                <span className="lg:text-sm">Topics</span>
-              </TabsTrigger>
-              <TabsTrigger
-                value="notes"
-                className="rounded-lg data-[state=active]:bg-white data-[state=active]:text-emerald-700 data-[state=active]:shadow-sm transition-all duration-200 lg:px-6"
-              >
-                <StickyNote className="h-3 w-3 mr-1 lg:mr-2" />
-                <span className="lg:text-sm">
-                  Notes {savedNotesCount > 0 && `(${savedNotesCount})`}
-                </span>
-              </TabsTrigger>
-              <TabsTrigger
-                value="downloads"
-                className="rounded-lg data-[state=active]:bg-white data-[state=active]:text-emerald-700 data-[state=active]:shadow-sm transition-all duration-200 lg:px-6"
-              >
-                <Download className="h-3 w-3 mr-1 lg:mr-2" />
-                <span className="lg:text-sm">
-                  Downloads {downloadsCount > 0 && `(${downloadsCount})`}
-                </span>
-              </TabsTrigger>
-            </TabsList>
-          </Tabs>
-
-          {/* View Mode Toggle - Desktop Only */}
-          {view === "home" && (
-            <div className="hidden lg:flex items-center gap-2 bg-slate-100/80 rounded-xl p-1">
-              <Button
-                variant={viewMode === "grid" ? "default" : "ghost"}
-                size="sm"
-                onClick={() => setViewMode("grid")}
-                className="rounded-lg h-8 w-8 p-0"
-              >
-                <Grid3X3 className="h-4 w-4" />
-              </Button>
-              <Button
-                variant={viewMode === "list" ? "default" : "ghost"}
-                size="sm"
-                onClick={() => setViewMode("list")}
-                className="rounded-lg h-8 w-8 p-0"
-              >
-                <List className="h-4 w-4" />
-              </Button>
-            </div>
-          )}
-        </div>
-
-        {/* Banner (Only on Home) */}
-        {view === "home" && !searchTerm && (
-          <Card className="mb-6 border-emerald-200 bg-linear-to-br from-emerald-50 to-teal-50 shadow-sm hover:shadow-md transition-all duration-300 lg:max-w-2xl">
-            <CardHeader className="pb-3">
-              <div className="flex items-center gap-2 mb-2">
-                <Badge
-                  variant="secondary"
-                  className="bg-emerald-600 text-white text-xs px-2 py-0 rounded-full"
-                >
-                  <Sparkles className="h-3 w-3 mr-1" /> v3.0
-                </Badge>
-              </div>
-              <CardTitle className="text-xl lg:text-2xl text-emerald-800 leading-tight">
-                Quranic Transformation
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-emerald-700/80 text-sm leading-relaxed lg:text-base">
-                Journey through divine wisdom with reflective insights and
-                spiritual growth
-              </p>
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Categories (Home only) */}
-        {view === "home" && (
-          <div className="flex gap-2 overflow-x-auto pb-4 scrollbar-hide lg:flex-wrap lg:overflow-visible">
-            {CATEGORIES.map((cat) => {
-              const theme = getCategoryTheme(cat);
-              const isActive = filterCategory === cat;
-              return (
-                <Button
-                  key={cat}
-                  variant={isActive ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setFilterCategory(cat)}
-                  className={`whitespace-nowrap rounded-full transition-all duration-300 lg:text-sm ${
-                    isActive
-                      ? "bg-emerald-600 text-white shadow-sm hover:bg-emerald-700 hover:scale-[1.02]"
-                      : "bg-white text-emerald-700 border-slate-200 hover:bg-slate-50 hover:scale-[1.02]"
-                  }`}
-                >
-                  {cat === "All" ? "All Topics" : cat}
-                </Button>
-              );
-            })}
-          </div>
-        )}
-
-        {/* Results */}
-        {filteredData.length === 0 ? (
-          <Card className="text-center py-16 border-slate-200 bg-white/90 shadow-sm lg:py-24">
-            <CardContent>
-              <div className="w-16 h-16 bg-slate-100 rounded-2xl mx-auto mb-4 flex items-center justify-center text-emerald-500 border border-slate-200 lg:w-20 lg:h-20">
-                {view === "notes" ? (
-                  <FileText size={32} />
-                ) : (
-                  <Search size={32} />
-                )}
-              </div>
-              <p className="font-semibold text-lg text-slate-800 mb-2 lg:text-xl">
-                {searchTerm ? "No results found" : "Nothing here yet"}
-              </p>
-              <p className="text-slate-600 text-sm lg:text-base">
-                {view === "notes"
-                  ? "Start taking notes on topics to see them here"
-                  : view === "downloads"
-                  ? "Download topics to access them offline"
-                  : "Try searching for different terms"}
-              </p>
-            </CardContent>
-          </Card>
-        ) : (
-          <div
-            className={`space-y-4 pb-safe lg:space-y-0 lg:gap-6 ${
-              viewMode === "grid" && view === "home"
-                ? "lg:grid lg:grid-cols-2 xl:grid-cols-3"
-                : "lg:space-y-4"
-            }`}
-          >
-            {filteredData.map((lesson) => (
-              <div
-                key={lesson.id}
-                className="transform transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] lg:hover:scale-[1.01]"
-              >
-                <LessonCard
-                  lesson={lesson}
-                  hasNote={!!notes[lesson.id]?.content}
-                  isDownloaded={downloadedIds.has(lesson.id)}
-                  onClick={() => setSelectedLesson(lesson)}
-                  viewMode={viewMode}
-                />
-              </div>
-            ))}
-          </div>
-        )}
-      </main>
-
-      <BottomNav
-        activeView={view}
-        onChangeView={(v) => {
-          setView(v);
-          setFilterCategory("All");
-          setSearchTerm("");
-          window.scrollTo(0, 0);
-        }}
-      />
-
+    <>
+      {/* 1. Sidebar (Responsive) */}
       <Sidebar
-        isOpen={sidebarOpen}
-        onClose={() => setSidebarOpen(false)}
+        isOpen={mobileSidebarOpen}
+        onClose={() => setMobileSidebarOpen(false)}
         activeView={view}
         onChangeView={setView}
         activeCategory={filterCategory}
         onSelectCategory={setFilterCategory}
         savedNotesCount={savedNotesCount}
-        downloadsCount={downloadsCount}
+        downloadsCount={downloadedIds.size}
       />
 
-      {/* --- MODALS (Stacked to preserve state) --- */}
+      {/* 2. Main Content Area */}
+      <main className="flex-1 h-screen overflow-y-auto bg-background relative w-full">
+        {/* Header */}
+        <header className="sticky top-0 z-30 bg-background/80 backdrop-blur-md border-b border-border px-4 py-4 md:px-8">
+          <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setMobileSidebarOpen(true)}
+                className="lg:hidden text-zinc-400 hover:text-white"
+              >
+                <Menu />
+              </Button>
+              <h1 className="text-xl font-bold tracking-tight text-white hidden md:block">
+                {view === "home"
+                  ? "Syllabus"
+                  : view === "notes"
+                  ? "My Reflections"
+                  : "Downloads"}
+              </h1>
+            </div>
+
+            {/* High Contrast Search */}
+            <div className="relative flex-1 max-w-md">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500 h-4 w-4" />
+              <Input
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                placeholder="Search topics, surahs..."
+                className="pl-9 bg-zinc-900/50 border-zinc-800 text-zinc-100 placeholder:text-zinc-600 focus:ring-1 focus:ring-emerald-500 rounded-full transition-all"
+              />
+            </div>
+          </div>
+
+          {/* Mobile Category Pills (Horizontal Scroll) - Only on Home */}
+          {view === "home" && (
+            <div className="mt-4 flex gap-2 overflow-x-auto pb-2 no-scrollbar md:hidden">
+              {CATEGORIES.map((cat) => (
+                <button
+                  key={cat}
+                  onClick={() => setFilterCategory(cat)}
+                  className={`whitespace-nowrap px-4 py-1.5 rounded-full text-xs font-medium transition-colors ${
+                    filterCategory === cat
+                      ? "bg-emerald-600 text-white"
+                      : "bg-zinc-900 border border-zinc-800 text-zinc-400"
+                  }`}
+                >
+                  {cat === "All" ? "All" : cat}
+                </button>
+              ))}
+            </div>
+          )}
+        </header>
+
+        {/* Content Grid */}
+        <div className="max-w-7xl mx-auto px-4 py-6 md:px-8 pb-24 md:pb-8">
+          {filteredData.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-20 text-zinc-500">
+              <Filter className="h-12 w-12 mb-4 opacity-20" />
+              <p>No lessons found.</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-6">
+              {filteredData.map((lesson) => (
+                <LessonCard
+                  key={lesson.id}
+                  lesson={lesson}
+                  hasNote={!!notes[lesson.id]?.content}
+                  isDownloaded={downloadedIds.has(lesson.id)}
+                  onClick={() => setSelectedLesson(lesson)}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+      </main>
+
+      {/* Mobile Bottom Nav */}
+      <BottomNav activeView={view} onChangeView={setView} />
+
+      {/* --- Modals & Overlays --- */}
 
       {/* 1. Detail Modal */}
       {selectedLesson && !isEditingNote && !isViewingPdf && (
@@ -412,7 +202,7 @@ export default function Home() {
         />
       )}
 
-      {/* 2. Note Editor (Overlays Detail) */}
+      {/* 2. Note Editor */}
       {selectedLesson && isEditingNote && (
         <NoteEditor
           lesson={selectedLesson}
@@ -425,10 +215,13 @@ export default function Home() {
         />
       )}
 
-      {/* 3. PDF Viewer Overlay (Overlays Detail) */}
+      {/* 3. PDF Viewer (Rebuilt) */}
       {selectedLesson && isViewingPdf && (
-        <PdfViewer lesson={selectedLesson} onClose={() => setIsViewingPdf(false)} />
+        <PdfViewer
+          lesson={selectedLesson}
+          onClose={() => setIsViewingPdf(false)}
+        />
       )}
-    </div>
+    </>
   );
 }
