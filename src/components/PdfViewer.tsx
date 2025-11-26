@@ -1,9 +1,8 @@
 "use client";
-import React from "react";
-import { Download, X, Maximize2, Minimize2 } from "lucide-react";
+import React, { useEffect } from "react";
+import { X, ExternalLink } from "lucide-react";
 import { Lesson, getEmbedUrl, getDownloadUrl } from "@/lib/constants";
 import { Button } from "@/components/ui/button";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 
 interface PdfViewerProps {
   lesson: Lesson;
@@ -11,76 +10,61 @@ interface PdfViewerProps {
 }
 
 const PdfViewer: React.FC<PdfViewerProps> = ({ lesson, onClose }) => {
-  const [isFullscreen, setIsFullscreen] = React.useState(false);
-
-  const toggleFullscreen = () => {
-    setIsFullscreen(!isFullscreen);
-  };
+  // Prevent body scroll when PDF is open
+  useEffect(() => {
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, []);
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-900/95 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-300">
-      <Card
-        className={`bg-white border-slate-200 shadow-2xl rounded-2xl overflow-hidden flex flex-col transition-all duration-300 ${
-          isFullscreen
-            ? "w-full h-full max-w-none rounded-none"
-            : "w-full max-w-6xl h-[90vh]"
-        }`}
-      >
-        <CardHeader className="bg-linear-to-r from-emerald-600 to-teal-600 text-white px-6 py-4 border-b border-emerald-500/30">
-          <div className="flex items-center justify-between">
-            <CardTitle className="text-lg font-semibold text-white truncate pr-4">
-              {lesson.topicName}
-            </CardTitle>
-            <div className="flex gap-2 shrink-0">
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-9 w-9 bg-white/20 hover:bg-white/30 text-white hover:scale-105 transition-all duration-200 rounded-xl border border-white/20"
-                onClick={toggleFullscreen}
-              >
-                {isFullscreen ? (
-                  <Minimize2 size={18} />
-                ) : (
-                  <Maximize2 size={18} />
-                )}
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-9 w-9 bg-white/20 hover:bg-white/30 text-white hover:scale-105 transition-all duration-200 rounded-xl border border-white/20"
-                asChild
-              >
-                <a
-                  href={getDownloadUrl(lesson.presentationLink)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <Download
-                    size={18}
-                    className="hover:scale-110 transition-transform"
-                  />
-                </a>
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={onClose}
-                className="h-9 w-9 bg-white/20 hover:bg-red-400/30 text-white hover:scale-105 transition-all duration-200 rounded-xl border border-white/20"
-              >
-                <X size={18} className="hover:scale-110 transition-transform" />
-              </Button>
-            </div>
-          </div>
-        </CardHeader>
+    // Z-Index 50 ensures it sits above everything.
+    // bg-zinc-950 ensures it is OPAQUE (fixes transparent issue).
+    <div className="fixed inset-0 z-50 flex flex-col bg-zinc-950 animate-in fade-in duration-200">
+      {/* Header Toolbar */}
+      <div className="flex items-center justify-between px-4 py-3 bg-zinc-900 border-b border-zinc-800 shrink-0">
+        <div className="flex flex-col">
+          <h3 className="text-sm font-medium text-zinc-100 truncate max-w-[200px] md:max-w-md">
+            {lesson.topicName}
+          </h3>
+          <span className="text-xs text-zinc-500">PDF Reader Mode</span>
+        </div>
 
-        <CardContent className="flex-1 p-0 bg-white">
-          <iframe
-            src={getEmbedUrl(lesson.presentationLink)}
-            className="w-full h-full border-0"
-            title={`PDF Viewer - ${lesson.topicName}`}
-          />
-        </CardContent>
-      </Card>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            className="hidden md:flex gap-2 border-zinc-700 bg-transparent text-zinc-300 hover:bg-zinc-800"
+            onClick={() =>
+              window.open(getDownloadUrl(lesson.presentationLink), "_blank")
+            }
+          >
+            <ExternalLink className="w-4 h-4" />
+            Open External
+          </Button>
+
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onClose}
+            className="rounded-full hover:bg-red-900/30 hover:text-red-400 text-zinc-400"
+          >
+            <X className="w-5 h-5" />
+          </Button>
+        </div>
+      </div>
+
+      {/* Iframe Container */}
+      <div className="flex-1 relative bg-zinc-900 w-full h-full">
+        {/* We use a white background for the iframe itself because PDF renderers often expect light backgrounds */}
+        <iframe
+          src={getEmbedUrl(lesson.presentationLink)}
+          className="w-full h-full border-0 bg-white"
+          title={`PDF - ${lesson.topicName}`}
+          allowFullScreen
+        />
+      </div>
     </div>
   );
 };
