@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { generatePasswordResetToken } from "@/lib/tokens";
 import * as z from "zod";
+import { sendPasswordResetEmail } from "@/lib/mail";
 
 // Validation Schema
 const ForgotPasswordSchema = z.object({
