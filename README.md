@@ -1,36 +1,124 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 📖 Quranic Transformation - Digital Syllabus & Study Companion
 
-## Getting Started
+![Project Banner](https://img.shields.io/badge/Status-Active-emerald) ![Next.js](https://img.shields.io/badge/Next.js-16.0-black) ![React](https://img.shields.io/badge/React-19.0-blue) ![Tailwind](https://img.shields.io/badge/Tailwind-CSS-38bdf8)
 
-First, run the development server:
+**Quranic Transformation** is a modern, interactive web application designed to facilitate the study of a comprehensive Islamic syllabus. It serves as a digital companion for students, allowing them to browse lessons, access study materials (PDFs), write personal reflections, and track their progress.
+
+---
+
+## 🚀 Features
+
+- **📚 Interactive Syllabus**: Browse a structured curriculum of 28+ lessons covering Foundations, Iman, Character, and Social Life.
+- **🔍 Smart Search & Filter**: Instantly find lessons by topic, Surah, or category.
+- **📝 Personal Reflections**: Write and save notes for each lesson. Supports **Urdu** and **English** typing modes.
+- **💾 Offline Tracking**: Mark lessons as "Downloaded" to track your offline study progress.
+- **📄 Integrated PDF Viewer**: Read lesson presentations directly within the app without leaving the interface.
+- **🌙 Premium Dark Mode**: A beautiful, eye-friendly dark interface designed for focused reading.
+- **📱 Fully Responsive**: Optimized experience for Mobile, Tablet, and Desktop devices.
+
+---
+
+## 🛠️ Tech Stack
+
+This project is built with the latest web technologies for performance and scalability:
+
+- **Framework**: [Next.js 16](https://nextjs.org/) (App Router)
+- **UI Library**: [React 19](https://react.dev/)
+- **Styling**: [Tailwind CSS](https://tailwindcss.com/)
+- **Icons**: [Lucide React](https://lucide.dev/)
+- **Components**: [Radix UI](https://www.radix-ui.com/) (Headless accessible components)
+- **State**: React Hooks (`useState`, `useReducer`) + LocalStorage for persistence.
+
+---
+
+## 📂 Project Structure
+
+For a detailed technical breakdown, please refer to the [Architecture Guide](docs/ARCHITECTURE.md).
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+src/
+├── app/                 # Main Application Logic
+├── components/          # UI Components (LessonCard, Sidebar, etc.)
+└── lib/                 # Data Constants & Utilities
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## ⚡ Getting Started
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Follow these steps to set up the project locally:
 
-## Learn More
+### Prerequisites
 
-To learn more about Next.js, take a look at the following resources:
+- Node.js 18+ installed.
+- npm, yarn, or pnpm.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Installation
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+1.  **Clone the repository:**
 
-## Deploy on Vercel
+    ```bash
+    git clone https://github.com/yourusername/quranic-transformation.git
+    cd quranic-transformation
+    ```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+2.  **Install dependencies:**
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+    ```bash
+    npm install
+    # or
+    yarn install
+    ```
+
+3.  **Run the development server:**
+
+    ```bash
+    npm run dev
+    ```
+
+4.  **Open the app:**
+    Visit [http://localhost:3000](http://localhost:3000) in your browser.
+
+---
+
+## 📖 Usage Guide
+
+### Browsing Lessons
+
+- Use the **Sidebar** to filter lessons by category (e.g., "Foundations").
+- Use the **Search Bar** at the top to find specific topics or Surahs.
+
+### Studying
+
+1.  Click on a **Lesson Card** to view details.
+2.  Click **"Read PDF"** to view the presentation slides.
+3.  Click **"Add Reflection"** to open the note editor.
+4.  Toggle **"Urdu Mode"** in the editor if you wish to write in Urdu.
+
+### Managing Progress
+
+- Click **"Download"** (or the download icon) to mark a lesson as available offline.
+- Switch to the **"Offline Library"** view in the sidebar to see only your downloaded lessons.
+- Switch to **"My Reflections"** to see lessons where you have added notes.
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+1.  Fork the project.
+2.  Create your feature branch (`git checkout -b feature/AmazingFeature`).
+3.  Commit your changes (`git commit -m 'Add some AmazingFeature'`).
+4.  Push to the branch (`git push origin feature/AmazingFeature`).
+5.  Open a Pull Request.
+
+---
+
+## 📄 License
+
+This project is open-source and available under the [MIT License](LICENSE).
+
+---
+
+_Developed with ❤️ for the students of the Quran._
