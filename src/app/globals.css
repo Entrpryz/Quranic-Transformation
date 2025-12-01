@@ -25,8 +25,7 @@
   /* Fonts */
   --font-sans: var(--font-inter);
   --font-gulzar: var(--font-gulzar);
-  --font-quran: var(--font-amiri);
-}
+  --font-quran: var(--font-quran); /* This now maps to Scheherazade New */}
 
 :root {
   /* Deep Dark Theme - Production Grade */
