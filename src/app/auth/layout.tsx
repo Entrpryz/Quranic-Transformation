@@ -48,7 +48,7 @@ export default function AuthLayout({
         console.error("Failed to fetch verse", error);
         // Fallback if API fails
         setVerse({
-          text: "رَّبِّ زِدْنِى عِلْمًا",
+          text: "رَّبِّ زِدْنِى عِلْمًا",
           translation: "My Lord, increase me in knowledge.",
           surah: { englishName: "Taha", number: 20 },
           numberInSurah: 114,
@@ -78,13 +78,13 @@ export default function AuthLayout({
         {/* Background Image with Overlay */}
         <div className="absolute inset-0 z-0">
           <Image
-            src="/Image.jpg"
+            src="/Image.jpg" // Ensure this image exists in your public folder!
             alt="Islamic Architecture"
             fill
             className="object-cover opacity-20 mix-blend-overlay"
             priority
           />
-          <div className="absolute inset-0 bg-linear-to-t from-zinc-950 via-zinc-950/80 to-zinc-950/20" />
+          <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/80 to-zinc-950/20" />
         </div>
 
         {/* Content Overlay */}
@@ -94,7 +94,7 @@ export default function AuthLayout({
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.2, duration: 0.5 }}
-            className="w-16 h-16 mx-auto rounded-2xl bg-linear-to-br from-emerald-500/20 to-teal-500/20 border border-emerald-500/30 flex items-center justify-center backdrop-blur-md shadow-[0_0_30px_-5px_rgba(16,185,129,0.3)]"
+            className="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-br from-emerald-500/20 to-teal-500/20 border border-emerald-500/30 flex items-center justify-center backdrop-blur-md shadow-[0_0_30px_-5px_rgba(16,185,129,0.3)]"
           >
             <BookOpen className="w-8 h-8 text-emerald-400" />
           </motion.div>
@@ -119,13 +119,14 @@ export default function AuthLayout({
                 transition={{ duration: 0.8 }}
                 className="space-y-6"
               >
-                {/* Arabic Text */}
-                <p className="text-3xl md:text-4xl font-gulzar text-emerald-400/90 leading-relaxed dir-rtl drop-shadow-lg">
+                {/* --- UPDATED: Arabic Text with Amiri Quran Font --- */}
+                {/* leading-loose is important for Arabic calligraphy legibility */}
+                <p className="text-3xl md:text-4xl font-quran text-emerald-400/90 leading-[2.5] dir-rtl drop-shadow-lg py-2">
                   {verse.text}
                 </p>
 
                 {/* Divider */}
-                <div className="w-24 h-px bg-linear-to-r from-transparent via-zinc-700 to-transparent mx-auto" />
+                <div className="w-24 h-px bg-gradient-to-r from-transparent via-zinc-700 to-transparent mx-auto" />
 
                 {/* English Text */}
                 <p className="text-xl md:text-2xl font-gulzar text-white/90 leading-relaxed italic">
@@ -149,7 +150,7 @@ export default function AuthLayout({
 
         {/* Mobile Logo */}
         <div className="lg:hidden mb-8 absolute top-8">
-          <div className="w-10 h-10 rounded-xl bg-linear-to-br from-emerald-500 to-teal-700 flex items-center justify-center shadow-lg shadow-emerald-900/20">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-700 flex items-center justify-center shadow-lg shadow-emerald-900/20">
             <Image
               src="/favicon.ico"
               alt="Logo"
