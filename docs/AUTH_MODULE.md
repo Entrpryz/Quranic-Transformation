@@ -89,3 +89,30 @@ Used for password recovery.
 | `/api/auth/reset-password`  | `POST`     | Resets password using a valid token.                             |
 | `/api/auth/google`          | `GET`      | Initiates Google OAuth flow.                                     |
 | `/api/auth/github`          | `GET`      | Initiates GitHub OAuth flow.                                     |
+
+## Frontend Implementation
+
+The frontend is built with **React** and **Tailwind CSS**, utilizing a shared layout for a consistent, premium look.
+
+### Shared Layout (`src/app/auth/layout.tsx`)
+
+- **Design**: Features a dark, glassmorphism aesthetic with an ambient emerald glow.
+- **Functionality**: Centers content and handles responsive positioning.
+- **Usage**: Wraps all pages in the `src/app/auth` directory.
+
+### Pages
+
+| Page Route              | Description        | Features                                                           |
+| :---------------------- | :----------------- | :----------------------------------------------------------------- |
+| `/auth/login`           | User Login         | Email/Password form, Social Login buttons, "Forgot Password" link. |
+| `/auth/register`        | User Registration  | Name/Email/Password form, Social Login buttons, Input validation.  |
+| `/auth/forgot-password` | Password Recovery  | Email input to request reset link.                                 |
+| `/auth/reset-password`  | Password Reset     | New password form, validates token from URL.                       |
+| `/auth/verify-email`    | Email Verification | Auto-verifies token from URL, shows success/error status.          |
+
+### UX Features
+
+- **Loading States**: All forms show loading spinners (`Loader2` from Lucide) during API requests.
+- **Error Handling**: Displays descriptive error messages using `Alert` components.
+- **Success Feedback**: Visual confirmation (Green checkmarks) upon successful actions.
+- **Responsiveness**: Fully optimized for mobile, tablet, and desktop screens.
