@@ -3,22 +3,15 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Loader2, Github, AlertCircle } from "lucide-react";
+import { Loader2, Github, ArrowRight } from "lucide-react";
+import { motion } from "framer-motion";
 
 // UI Components
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -29,7 +22,6 @@ export default function LoginPage() {
     event.preventDefault();
     setIsLoading(true);
     setError(null);
-
     const formData = new FormData(event.currentTarget);
     const data = Object.fromEntries(formData);
 
@@ -41,77 +33,78 @@ export default function LoginPage() {
       });
 
       const result = await response.json();
+      if (!response.ok) throw new Error(result.error || "Something went wrong");
 
-      if (!response.ok) {
-        throw new Error(result.error || "Something went wrong");
-      }
-
-      // Redirect to dashboard or home on success
       router.push("/dashboard");
-      router.refresh(); // Ensure session state is updated
+      router.refresh();
     } catch (err) {
-      if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError("An unknown error occurred");
-      }
+      setError(
+        err instanceof Error ? err.message : "An unknown error occurred"
+      );
     } finally {
       setIsLoading(false);
     }
   }
 
-  // Placeholder for OAuth
   const handleOAuthLogin = (provider: string) => {
-    console.log(`Login with ${provider}`);
+    window.location.href = `/api/auth/${provider}`;
   };
 
   return (
-    <Card className="border-zinc-800 bg-zinc-900/50 backdrop-blur-xl shadow-2xl">
-      <CardHeader className="space-y-1 flex flex-col items-center text-center pb-6">
-        <CardTitle className="text-2xl font-bold tracking-tight text-white">
-          Welcome back
-        </CardTitle>
-        <CardDescription className="text-zinc-400">
-          Enter your email to sign in to your account
-        </CardDescription>
-      </CardHeader>
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className="space-y-6"
+    >
+      <div className="space-y-2 text-center">
+        <h1 className="text-3xl font-gulzar text-white tracking-wide">
+          Welcome Back
+        </h1>
+        <p className="text-zinc-400">Continue your journey of transformation</p>
+      </div>
 
-      <CardContent className="space-y-4">
+      <div className="p-1">
+        {" "}
+        {/* Padding for focus rings to show fully */}
         <form onSubmit={onSubmit} className="space-y-4">
           {error && (
-            <Alert
-              variant="destructive"
-              className="bg-red-500/10 border-red-500/20 text-red-400"
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
             >
-              <AlertCircle className="h-4 w-4" />
-              <AlertTitle>Error</AlertTitle>
-              <AlertDescription>{error}</AlertDescription>
-            </Alert>
+              <Alert
+                variant="destructive"
+                className="bg-red-500/10 border-red-500/20 text-red-400 text-sm py-2"
+              >
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            </motion.div>
           )}
 
           <div className="space-y-2">
-            <Label htmlFor="email" className="text-zinc-300">
+            <Label className="text-zinc-400 text-xs uppercase tracking-wider">
               Email
             </Label>
             <Input
               id="email"
               name="email"
               type="email"
-              placeholder="name@example.com"
               required
               disabled={isLoading}
-              className="bg-zinc-950/50 border-zinc-800 text-white placeholder:text-zinc-600 focus-visible:ring-emerald-500/50"
+              className="bg-zinc-900/50 border-zinc-800 focus-visible:ring-emerald-500/50 focus-visible:border-emerald-500 text-white h-11 transition-all"
+              placeholder="name@example.com"
             />
           </div>
 
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <Label htmlFor="password" className="text-zinc-300">
+              <Label className="text-zinc-400 text-xs uppercase tracking-wider">
                 Password
               </Label>
               <Link
                 href="/auth/forgot-password"
-                className="text-xs text-emerald-500 hover:text-emerald-400 hover:underline"
+                className="text-xs text-emerald-500 hover:text-emerald-400 transition-colors"
               >
                 Forgot password?
               </Link>
@@ -120,43 +113,39 @@ export default function LoginPage() {
               id="password"
               name="password"
               type="password"
-              placeholder="••••••••"
               required
               disabled={isLoading}
-              className="bg-zinc-950/50 border-zinc-800 text-white placeholder:text-zinc-600 focus-visible:ring-emerald-500/50"
+              className="bg-zinc-900/50 border-zinc-800 focus-visible:ring-emerald-500/50 focus-visible:border-emerald-500 text-white h-11 transition-all"
+              placeholder="••••••••"
             />
           </div>
 
           <Button
             type="submit"
-            className="w-full bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg shadow-emerald-900/20 transition-all"
+            className="w-full bg-linear-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white h-11 shadow-lg shadow-emerald-900/20 transition-all duration-300"
             disabled={isLoading}
           >
             {isLoading ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Signing in...
-              </>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
             ) : (
-              "Sign In with Email"
+              "Sign In"
             )}
           </Button>
         </form>
-
-        <div className="relative">
+        <div className="relative my-6">
           <div className="absolute inset-0 flex items-center">
             <Separator className="bg-zinc-800" />
           </div>
           <div className="relative flex justify-center text-xs uppercase">
-            <span className="bg-zinc-900 px-2 text-zinc-500">
+            <span className="bg-zinc-950 px-2 text-zinc-500">
               Or continue with
             </span>
           </div>
         </div>
-
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-2 gap-4">
           <Button
             variant="outline"
-            className="border-zinc-700 bg-zinc-900 text-zinc-300 hover:bg-zinc-800 hover:text-white"
+            className="h-11 border-zinc-800 bg-zinc-900 text-zinc-300 hover:bg-zinc-800 hover:text-white transition-all"
             onClick={() => handleOAuthLogin("github")}
             disabled={isLoading}
           >
@@ -164,7 +153,7 @@ export default function LoginPage() {
           </Button>
           <Button
             variant="outline"
-            className="border-zinc-700 bg-zinc-900 text-zinc-300 hover:bg-zinc-800 hover:text-white"
+            className="h-11 border-zinc-800 bg-zinc-900 text-zinc-300 hover:bg-zinc-800 hover:text-white transition-all"
             onClick={() => handleOAuthLogin("google")}
             disabled={isLoading}
           >
@@ -185,23 +174,22 @@ export default function LoginPage() {
                 d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
                 fill="#EA4335"
               />
-            </svg>
+            </svg>{" "}
             Google
           </Button>
         </div>
-      </CardContent>
+      </div>
 
-      <CardFooter className="flex justify-center pb-6">
-        <div className="text-sm text-zinc-400">
-          Don&apos;t have an account?{" "}
-          <Link
-            href="/auth/register"
-            className="text-emerald-500 hover:text-emerald-400 font-medium hover:underline transition-all"
-          >
-            Sign up
-          </Link>
-        </div>
-      </CardFooter>
-    </Card>
+      <p className="text-center text-sm text-zinc-500 mt-6">
+        Don&apos;t have an account?{" "}
+        <Link
+          href="/auth/register"
+          className="text-emerald-500 hover:text-emerald-400 font-medium hover:underline inline-flex items-center group"
+        >
+          Sign up{" "}
+          <ArrowRight className="ml-1 h-3 w-3 group-hover:translate-x-1 transition-transform" />
+        </Link>
+      </p>
+    </motion.div>
   );
 }
