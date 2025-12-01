@@ -30,7 +30,7 @@ export default function AuthLayout({
         {/* Background Image with Overlay */}
         <div className="absolute inset-0 z-0">
           <Image
-            src="https://images.unsplash.com/photo-1584551246679-0daf3d275d0f?q=80&w=1000&auto=format&fit=crop"
+            src="/Image.jpg"
             alt="Islamic Architecture"
             fill
             className="object-cover opacity-20 mix-blend-overlay"
