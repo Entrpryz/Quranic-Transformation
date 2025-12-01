@@ -33,7 +33,10 @@ This project is built with the latest web technologies for performance and scala
 
 ## 📂 Project Structure
 
-For a detailed technical breakdown, please refer to the [Architecture Guide](docs/ARCHITECTURE.md).
+For a detailed technical breakdown, please refer to:
+
+- [Architecture Guide](docs/ARCHITECTURE.md)
+- [Auth Module Documentation](docs/AUTH_MODULE.md)
 
 ```bash
 src/
