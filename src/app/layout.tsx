@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Gulzar, Amiri_Quran } from "next/font/google";
+import { Inter, Gulzar, Scheherazade_New } from "next/font/google";
 import "./globals.css";
 
 const inter = Inter({
@@ -15,11 +15,11 @@ const gulzar = Gulzar({
   variable: "--font-gulzar",
 });
 
-const amiri = Amiri_Quran({
-  weight: "400",
+const quranFont = Scheherazade_New({
+  weight: ["400", "700"], // It supports bold, which is great for emphasis
   subsets: ["arabic"],
   display: "swap",
-  variable: "--font-amiri",
+  variable: "--font-quran",
 });
 
 export const metadata: Metadata = {
@@ -35,7 +35,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${inter.variable} ${gulzar.variable} ${amiri.variable} dark`}
+      className={`${inter.variable} ${gulzar.variable} ${quranFont.variable} dark`}
     >
       <head>
         <meta
