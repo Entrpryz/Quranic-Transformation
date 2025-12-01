@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Gulzar } from "next/font/google";
+import { Inter, Gulzar, Amiri_Quran } from "next/font/google";
 import "./globals.css";
 
 const inter = Inter({
@@ -15,6 +15,13 @@ const gulzar = Gulzar({
   variable: "--font-gulzar",
 });
 
+const amiri = Amiri_Quran({
+  weight: "400",
+  subsets: ["arabic"],
+  display: "swap",
+  variable: "--font-amiri",
+});
+
 export const metadata: Metadata = {
   title: "Quranic Transformation",
   description: "Journey through divine wisdom",
@@ -26,7 +33,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} ${gulzar.variable} dark`}>
+    <html
+      lang="en"
+      className={`${inter.variable} ${gulzar.variable} ${amiri.variable} dark`}
+    >
       <head>
         <meta
           name="viewport"
