@@ -3,14 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev  -p 4000",
+    "dev": "cd src && npx prisma generate && cd .. && next dev  -p 4000",
     "build": "next build",
-    "start": "next start  -p 4000",
+    "start": "cd src && npx prisma generate && cd .. && next start  -p 4000",
     "lint": "eslint",
-    "prisma:seed": "npx ts-node prisma/seed.ts"
-  },
-  "prisma": {
-    "seed": "npx ts-node prisma/seed.ts"
+    "prisma:seed": "npx ts-node src/prisma/seed.ts"
   },
   "dependencies": {
     "@prisma/client": "^7.1.0",
