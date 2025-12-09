@@ -1,13 +1,11 @@
 import { PrismaClient } from '@prisma/client'
-import { PrismaPg } from '@prisma/adapter-pg'
 
-const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL })
-const prisma = new PrismaClient({ adapter })
+const prisma = new PrismaClient()
 
 async function main() {
   console.log('Start seeding...')
 
-  // Clean existing lessons to avoid duplicates during dev
+  // Optional: Clean existing lessons to avoid duplicates during dev
   // await prisma.lesson.deleteMany() 
   
   // Data derived from your CSV
@@ -100,7 +98,7 @@ async function main() {
       verses: "1-10 / Complete / Complete",
       presentationLink: "https://drive.google.com/open?id=1KEq1oBV2HWswQs46Psr-rOi3QCeIEEKN&usp=drive_copy",
       description: "Pre-Conditions for Guidance & Tazkiyah",
-      urduTitle: null // Not provided in CSV for this specific row
+      urduTitle: null
     },
     {
       part: "Part 2",
@@ -336,7 +334,6 @@ async function main() {
         title: lesson.title,
         urduTitle: lesson.urduTitle,
         description: lesson.description,
-        // Mapping CSV columns to Schema fields
         hours: lesson.hours,
         surahNo: lesson.surahNo,
         surahReference: lesson.surahReference,
