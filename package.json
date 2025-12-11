@@ -4,9 +4,9 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "dev": "cd src && npx prisma generate && cd .. && next dev  -p 4000",
+    "dev": "cd src && npx prisma generate && cd .. && next dev  -p 3000",
     "build": "next build",
-    "start": "cd src && npx prisma generate && cd .. && next start  -p 4000",
+    "start": "cd src && npx prisma generate && cd .. && next start  -p 3000",
     "lint": "eslint",
     "prisma:seed": "prisma db seed"
   },
