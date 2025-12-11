@@ -5,7 +5,7 @@
   "private": true,
   "scripts": {
     "dev": "cd src && npx prisma generate && cd .. && next dev  -p 4000",
-    "build": "next build",
+    "build": "cd src && npx prisma generate && cd .. && next build",
     "start": "cd src && npx prisma generate && cd .. && next start  -p 4000",
     "lint": "eslint",
     "prisma:seed": "prisma db seed"
