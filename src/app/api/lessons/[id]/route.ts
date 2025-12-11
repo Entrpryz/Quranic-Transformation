@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { getSession } from "@/lib/session";
+
 
 export async function GET(
   request: Request,
@@ -31,6 +33,13 @@ export async function GET(
 
     if (!lesson) {
       return NextResponse.json({ error: "Lesson not found" }, { status: 404 });
+    }
+
+    const session = await getSession();
+    const isAdmin = session?.role === "ADMIN";
+
+    if (lesson.minRole === "ADMIN" && !isAdmin) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
     }
 
     return NextResponse.json(lesson);
