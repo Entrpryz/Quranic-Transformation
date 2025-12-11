@@ -167,7 +167,7 @@ export default function LessonsPage() {
               <option value="ADMIN">Admins Only</option>
             </select>
             <p className="text-xs text-zinc-500 mt-2">
-              "Admins Only" will hide this lesson from regular students.
+              &quot;Admins Only&quot; will hide this lesson from regular students.
             </p>
           </div>
 
