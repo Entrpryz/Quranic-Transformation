@@ -71,10 +71,12 @@ export async function GET(request: Request) {
       maxAge: 7 * 24 * 60 * 60,
     });
 
-    return NextResponse.redirect(new URL("/dashboard", request.url));
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || request.url;
+    return NextResponse.redirect(new URL("/dashboard", baseUrl));
 
   } catch (error) {
     console.error("Google Auth Error:", error);
-    return NextResponse.redirect(new URL("/auth/login?error=GoogleAuthFailed", request.url));
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || request.url;
+    return NextResponse.redirect(new URL("/auth/login?error=GoogleAuthFailed", baseUrl));
   }
 }
