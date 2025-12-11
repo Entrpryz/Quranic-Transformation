@@ -45,7 +45,7 @@ export default function LessonsPage() {
     try {
       await fetch(`/api/admin/lessons/${id}`, { method: "DELETE" });
       setLessons(lessons.filter((l) => l.id !== id));
-    } catch (error) {
+    } catch {
       alert("Failed to delete");
     }
   };
