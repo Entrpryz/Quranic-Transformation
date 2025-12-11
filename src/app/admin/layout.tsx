@@ -10,8 +10,15 @@ export default async function AdminLayout({
   children: React.ReactNode;
 }) {
   const session = await getSession();
+  console.log("AdminLayout Session:", session);
 
   if (!session || session.role !== UserRole.ADMIN) {
+    console.log(
+      "AdminLayout: Redirecting to /, session valid:",
+      !!session,
+      "role:",
+      session?.role
+    );
     redirect("/"); // Or /login, but / prevents leaking admin existence slightly more? User implies redirect.
   }
 

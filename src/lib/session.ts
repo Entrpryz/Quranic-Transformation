@@ -21,7 +21,9 @@ export async function decrypt(input: string): Promise<any> {
     });
     return payload;
   } catch (error) {
-     console.log(error);
+    console.log("Session Decrypt Error:", error);
+    console.log("Secret Key Used (starts with):", secretKey.substring(0, 3));
+    console.log("Input token (starts with):", input.substring(0, 10));
     return null;
   }
 }
