@@ -64,6 +64,7 @@ export async function POST(req: Request) {
 
     // 5. Generate JWT
     const token = await encrypt(sessionData);
+    console.log("Login: Generated Token (first 20 chars):", token.substring(0, 20));
 
     // 6. Set HTTP-Only Cookie
     const cookieStore = await cookies();
