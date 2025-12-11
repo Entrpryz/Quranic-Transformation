@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { getSession } from "@/lib/session";
 import { UserRole } from "@prisma/client";
 import { NextResponse } from "next/server";
