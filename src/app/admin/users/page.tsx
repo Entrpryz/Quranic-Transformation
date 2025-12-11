@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import React, { useEffect, useState } from "react";
@@ -17,7 +18,7 @@ export default function UsersPage() {
         setUsers(data.users);
       }
     } catch (error) {
-      console.error("Failed to fetch users");
+      console.error("Failed to fetch users", error);
     } finally {
       setLoading(false);
     }
@@ -48,6 +49,7 @@ export default function UsersPage() {
         alert(data.error || "Failed to update role");
       }
     } catch (error) {
+      console.error("Failed to update role", error);
       alert("Error updating role");
     } finally {
       setActionLoading(null);
@@ -74,6 +76,7 @@ export default function UsersPage() {
         alert(data.error || "Failed to ban user");
       }
     } catch (error) {
+      console.error("Failed to ban user", error);
       alert("Error banning user");
     } finally {
       setActionLoading(null);
