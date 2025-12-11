@@ -37,6 +37,23 @@ const Sidebar: React.FC<SidebarProps> = ({
   savedNotesCount,
   downloadsCount,
 }) => {
+  const [userData, setUserData] = React.useState<any>(null);
+
+  React.useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const res = await fetch("/api/user/me");
+        if (res.ok) {
+          const data = await res.json();
+          setUserData(data.user);
+        }
+      } catch (error) {
+        console.error("Failed to fetch user data", error);
+      }
+    };
+    fetchUser();
+  }, []);
+
   const NavItem = ({ id, label, icon: Icon, count }: any) => {
     const isActive = activeView === id;
     return (
@@ -155,11 +172,18 @@ const Sidebar: React.FC<SidebarProps> = ({
       <div className="p-4 border-t border-zinc-800 bg-zinc-900/30">
         <div className="flex items-center gap-3">
           <div className="h-8 w-8 rounded-full bg-linear-to-br from-emerald-500 to-teal-700 flex items-center justify-center text-white text-xs font-bold">
-            U
+            {userData?.name ? userData.name.charAt(0).toUpperCase() : "U"}
           </div>
           <div className="flex flex-col">
-            <span className="text-xs font-medium text-white">Student User</span>
-            <span className="text-[10px] text-zinc-500">v3.0.0 Stable</span>
+            <span className="text-xs font-medium text-white">
+              {userData?.name || "Student User"}
+            </span>
+            <span
+              className="text-[10px] text-zinc-500 w-[160px] truncate"
+              title={userData?.email}
+            >
+              {userData?.email || "v3.0.0 Stable"}
+            </span>
           </div>
         </div>
       </div>
