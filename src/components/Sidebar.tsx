@@ -234,7 +234,7 @@ const Sidebar: React.FC<SidebarProps> = ({
             <Tooltip>
               <TooltipTrigger asChild>
                 <Link
-                  href="/api/auth/logout"
+                  href="/auth/logout"
                   className="ml-auto text-zinc-500 hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100"
                 >
                   <LogOut size={16} />
