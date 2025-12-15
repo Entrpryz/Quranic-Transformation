@@ -9,6 +9,8 @@ import {
   CheckCircle2,
   AlertCircle,
   Lock,
+  Eye,
+  EyeOff,
 } from "lucide-react";
 import { motion } from "framer-motion";
 
@@ -17,6 +19,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 function ResetPasswordForm() {
   const router = useRouter();
@@ -27,6 +37,10 @@ function ResetPasswordForm() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
+  // Password Visibility States
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setIsLoading(true);
@@ -35,15 +49,17 @@ function ResetPasswordForm() {
 
     if (!token) {
       setError("Missing reset token");
+      setIsLoading(false);
       return;
     }
 
     const formData = new FormData(event.currentTarget);
-    const password = formData.get("password");
-    const confirmPassword = formData.get("confirmPassword");
+    const password = formData.get("password") as string;
+    const confirmPassword = formData.get("confirmPassword") as string;
 
     if (password !== confirmPassword) {
       setError("Passwords do not match");
+      setIsLoading(false);
       return;
     }
 
@@ -68,149 +84,196 @@ function ResetPasswordForm() {
     }
   }
 
-  // Invalid Token State
+  // Wrapper for standard card layout
+  const CardWrapper = ({ children }: { children: React.ReactNode }) => (
+    <div className="flex min-h-[80vh] w-full items-center justify-center px-4">
+      <Card className="w-full max-w-md border-zinc-800 bg-zinc-950/50 shadow-xl backdrop-blur-sm">
+        {children}
+      </Card>
+    </div>
+  );
+
+  // 1. Invalid Token State
   if (!token) {
     return (
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        className="text-center space-y-6"
-      >
-        <div className="w-20 h-20 mx-auto bg-red-500/10 rounded-full flex items-center justify-center border border-red-500/20">
-          <AlertCircle className="w-10 h-10 text-red-500" />
-        </div>
-        <div className="space-y-2">
-          <h2 className="text-2xl font-gulzar text-white">Invalid Link</h2>
-          <p className="text-zinc-400 max-w-xs mx-auto">
+      <CardWrapper>
+        <CardHeader className="text-center pb-2">
+          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-red-500/10 border border-red-500/20">
+            <AlertCircle className="h-8 w-8 text-red-500" />
+          </div>
+          <CardTitle className="text-2xl font-gulzar tracking-wide text-white">
+            Invalid Link
+          </CardTitle>
+          <CardDescription className="text-zinc-400">
             This password reset link is invalid or has expired.
-          </p>
-        </div>
-        <Button
-          asChild
-          variant="outline"
-          className="border-zinc-800 text-zinc-300 hover:bg-zinc-800 hover:text-white"
-        >
-          <Link href="/auth/forgot-password">Request a new link</Link>
-        </Button>
-      </motion.div>
+          </CardDescription>
+        </CardHeader>
+        <CardFooter className="flex justify-center pt-4 pb-6">
+          <Button
+            variant="outline"
+            className="w-full border-zinc-800 bg-zinc-900 text-zinc-300 hover:bg-zinc-800 hover:text-white"
+            asChild
+          >
+            <Link href="/auth/forgot-password">Request a new link</Link>
+          </Button>
+        </CardFooter>
+      </CardWrapper>
     );
   }
 
-  // Success State
+  // 2. Success State
   if (success) {
     return (
-      <motion.div
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        className="text-center space-y-6"
-      >
-        <div className="w-20 h-20 mx-auto bg-emerald-500/10 rounded-full flex items-center justify-center border border-emerald-500/20 shadow-[0_0_40px_-10px_rgba(16,185,129,0.5)]">
-          <CheckCircle2 className="w-10 h-10 text-emerald-500" />
-        </div>
-        <div className="space-y-2">
-          <h2 className="text-2xl font-gulzar text-white">Password Reset</h2>
-          <p className="text-zinc-400">
-            Your password has been successfully updated.
-          </p>
-        </div>
-        <Button
-          className="w-full bg-emerald-600 hover:bg-emerald-700 text-white h-11"
-          onClick={() => router.push("/auth/login")}
+      <CardWrapper>
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
         >
-          Back to Login
-        </Button>
-      </motion.div>
+          <CardHeader className="text-center pb-2">
+            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-emerald-500/10 border border-emerald-500/20 shadow-[0_0_40px_-10px_rgba(16,185,129,0.3)]">
+              <CheckCircle2 className="h-8 w-8 text-emerald-500" />
+            </div>
+            <CardTitle className="text-2xl font-gulzar tracking-wide text-white">
+              Password Reset
+            </CardTitle>
+            <CardDescription className="text-zinc-400">
+              Your password has been successfully updated.
+            </CardDescription>
+          </CardHeader>
+          <CardFooter className="flex justify-center pt-4 pb-6">
+            <Button
+              className="w-full bg-linear-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white shadow-lg"
+              onClick={() => router.push("/auth/login")}
+            >
+              Back to Login
+            </Button>
+          </CardFooter>
+        </motion.div>
+      </CardWrapper>
     );
   }
 
-  // Main Form
+  // 3. Main Form State
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-      className="space-y-6"
-    >
-      <div className="space-y-2 text-center">
-        <h1 className="text-3xl font-gulzar text-white tracking-wide">
-          Set New Password
-        </h1>
-        <p className="text-zinc-400">Please enter your new password below.</p>
-      </div>
+    <CardWrapper>
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        <CardHeader className="space-y-1 text-center">
+          <CardTitle className="text-2xl font-gulzar tracking-wide text-white">
+            Set New Password
+          </CardTitle>
+          <CardDescription className="text-zinc-400">
+            Please enter and confirm your new password below.
+          </CardDescription>
+        </CardHeader>
 
-      <form onSubmit={onSubmit} className="space-y-4">
-        {error && (
-          <Alert
-            variant="destructive"
-            className="bg-red-500/10 border-red-500/20 text-red-400 text-sm py-2"
+        <CardContent>
+          <form onSubmit={onSubmit} className="space-y-4">
+            {error && (
+              <Alert
+                variant="destructive"
+                className="border-red-500/20 bg-red-500/10 text-red-400 py-2"
+              >
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
+
+            <div className="space-y-2">
+              <Label
+                htmlFor="password"
+                className="text-xs font-medium uppercase tracking-wider text-zinc-400"
+              >
+                New Password
+              </Label>
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
+                <Input
+                  id="password"
+                  name="password"
+                  type={showPassword ? "text" : "password"}
+                  placeholder="••••••••"
+                  required
+                  minLength={6}
+                  disabled={isLoading}
+                  className="bg-zinc-900 border-zinc-800 focus-visible:ring-emerald-600 text-white placeholder:text-zinc-600 pl-10 pr-10"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-300"
+                >
+                  {showPassword ? (
+                    <EyeOff className="h-4 w-4" />
+                  ) : (
+                    <Eye className="h-4 w-4" />
+                  )}
+                </button>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label
+                htmlFor="confirmPassword"
+                className="text-xs font-medium uppercase tracking-wider text-zinc-400"
+              >
+                Confirm Password
+              </Label>
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
+                <Input
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  type={showConfirmPassword ? "text" : "password"}
+                  placeholder="••••••••"
+                  required
+                  minLength={6}
+                  disabled={isLoading}
+                  className="bg-zinc-900 border-zinc-800 focus-visible:ring-emerald-600 text-white placeholder:text-zinc-600 pl-10 pr-10"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-300"
+                >
+                  {showConfirmPassword ? (
+                    <EyeOff className="h-4 w-4" />
+                  ) : (
+                    <Eye className="h-4 w-4" />
+                  )}
+                </button>
+              </div>
+            </div>
+
+            <Button
+              type="submit"
+              className="w-full bg-linear-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white shadow-lg shadow-emerald-900/20"
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Updating...
+                </>
+              ) : (
+                "Reset Password"
+              )}
+            </Button>
+          </form>
+        </CardContent>
+
+        <CardFooter className="flex justify-center border-t border-zinc-800/50 pt-6">
+          <Link
+            href="/auth/login"
+            className="flex items-center text-sm text-zinc-500 hover:text-white transition-colors"
           >
-            <AlertDescription>{error}</AlertDescription>
-          </Alert>
-        )}
-
-        <div className="space-y-2">
-          <Label className="text-zinc-400 text-xs uppercase tracking-wider">
-            New Password
-          </Label>
-          <div className="relative">
-            <Input
-              id="password"
-              name="password"
-              type="password"
-              placeholder="••••••••"
-              required
-              minLength={6}
-              disabled={isLoading}
-              className="bg-zinc-900/50 border-zinc-800 focus-visible:ring-emerald-500/50 focus-visible:border-emerald-500 text-white h-11 pl-10"
-            />
-            <Lock className="w-4 h-4 text-zinc-500 absolute left-3 top-3.5" />
-          </div>
-        </div>
-
-        <div className="space-y-2">
-          <Label className="text-zinc-400 text-xs uppercase tracking-wider">
-            Confirm Password
-          </Label>
-          <div className="relative">
-            <Input
-              id="confirmPassword"
-              name="confirmPassword"
-              type="password"
-              placeholder="••••••••"
-              required
-              minLength={6}
-              disabled={isLoading}
-              className="bg-zinc-900/50 border-zinc-800 focus-visible:ring-emerald-500/50 focus-visible:border-emerald-500 text-white h-11 pl-10"
-            />
-            <Lock className="w-4 h-4 text-zinc-500 absolute left-3 top-3.5" />
-          </div>
-        </div>
-
-        <Button
-          type="submit"
-          className="w-full bg-linear-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white h-11 shadow-lg shadow-emerald-900/20 transition-all duration-300"
-          disabled={isLoading}
-        >
-          {isLoading ? (
-            <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Updating...
-            </>
-          ) : (
-            "Reset Password"
-          )}
-        </Button>
-      </form>
-
-      <div className="flex justify-center pt-2">
-        <Link
-          href="/auth/login"
-          className="flex items-center text-sm text-zinc-500 hover:text-white transition-colors"
-        >
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to Login
-        </Link>
-      </div>
-    </motion.div>
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Back to Login
+          </Link>
+        </CardFooter>
+      </motion.div>
+    </CardWrapper>
   );
 }
 
@@ -218,8 +281,8 @@ export default function ResetPasswordPage() {
   return (
     <Suspense
       fallback={
-        <div className="text-zinc-500 text-center animate-pulse">
-          Loading...
+        <div className="flex min-h-screen items-center justify-center">
+          <Loader2 className="h-8 w-8 animate-spin text-emerald-500" />
         </div>
       }
     >
