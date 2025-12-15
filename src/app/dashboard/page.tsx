@@ -2,13 +2,13 @@
 "use client";
 
 import React, { useState, useEffect, useMemo } from "react";
-import { Menu, Search, Filter, BookOpen } from "lucide-react";
+import { Menu, Search, BookOpen, Sparkles, Inbox, Loader2 } from "lucide-react";
 import { CATEGORIES, Lesson } from "@/lib/constants";
 
 // Components
 import LessonCard from "@/components/LessonCard";
 import LessonDetail from "@/components/LessonDetail";
-import NoteEditor from "@/components/NoteEditor"; // Assume this can be adapted or reused
+import NoteEditor from "@/components/NoteEditor";
 import Sidebar from "@/components/Sidebar";
 import PdfViewer from "@/components/PdfViewer";
 import BottomNav from "@/components/BottomNav";
@@ -16,6 +16,7 @@ import BottomNav from "@/components/BottomNav";
 // UI
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 
 interface Note {
   content: string;
@@ -32,18 +33,10 @@ export default function Dashboard() {
   // --- Data State ---
   const [lessons, setLessons] = useState<Lesson[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-
-  // We will fetch notes (reflections) and bookmarks from API now
   const [notes, setNotes] = useState<Record<number, Note>>({});
-  // Map lessonId -> Note. For API integration, we might need to adjust this structure
-  // or fetching logic.
-
   const [downloadedIds, setDownloadedIds] = useState<Set<number>>(new Set());
-  // For now "downloads" might still be local or bookmarks API specific.
-  // Plan said "Integrate Bookmarks". Let's assume Bookmarks = Downloads/Saved for now?
-  // Or separate concepts? The UI calls it "Offline Library" or "Downloads".
-  // Note: Local storage "qt_downloads" was used. I'll stick to API for persistence if possible.
 
+  // --- UI State ---
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [selectedLesson, setSelectedLesson] = useState<Lesson | null>(null);
   const [isEditingNote, setIsEditingNote] = useState(false);
@@ -57,15 +50,17 @@ export default function Dashboard() {
   const fetchData = async () => {
     setIsLoading(true);
     try {
-      // 1. Fetch Lessons
-      const lessonsRes = await fetch("/api/lessons");
+      // Parallel data fetching for performance
+      const [lessonsRes, reflectionsRes, bookmarksRes] = await Promise.all([
+        fetch("/api/lessons"),
+        fetch("/api/reflections"),
+        fetch("/api/bookmarks"),
+      ]);
+
       const lessonsData = await lessonsRes.json();
       setLessons(lessonsData);
 
-      // 2. Fetch Reflections (Notes)
-      const reflectionsRes = await fetch("/api/reflections");
       const reflectionsData = await reflectionsRes.json();
-      // Transform to record for easy lookup
       const notesMap: Record<number, Note> = {};
       reflectionsData.forEach((r: any) => {
         notesMap[r.lessonId] = {
@@ -76,8 +71,6 @@ export default function Dashboard() {
       });
       setNotes(notesMap);
 
-      // 3. Fetch Bookmarks
-      const bookmarksRes = await fetch("/api/bookmarks");
       const bookmarksData = await bookmarksRes.json();
       const bIds = new Set<number>(bookmarksData.map((b: any) => b.lessonId));
       setDownloadedIds(bIds);
@@ -93,7 +86,6 @@ export default function Dashboard() {
     content: string,
     isUrdu: boolean
   ) => {
-    // Optimistic update
     const updatedNotes = {
       ...notes,
       [lessonId]: { content, isUrdu, lastModified: new Date().toISOString() },
@@ -102,31 +94,17 @@ export default function Dashboard() {
 
     try {
       await fetch("/api/reflections", {
-        method: "POST", // Simplified: UPSERT logic needed on server or here?
-        // My API POST creates new. I need logic to update if exists.
-        // My plan said: GET, POST (Create).
-        // My implementation of POST: simple Create.
-        // Ideally UI should check if note exists -> PUT, else POST.
-        // Or simpler: NoteEditor passes handleSave.
-        // Let's implement check here.
+        method: "POST",
         body: JSON.stringify({ lessonId, content, isUrdu }),
         headers: { "Content-Type": "application/json" },
       });
-      // Actually, if I want proper UPSERT, passing ID would be better.
-      // For now, I'll rely on POST doing create, but wait, duplicate reflections?
-      // My schema has generic Reflection. `UserProgress` is unique per user/lesson. `Reflection` logic?
-      // Schema: `Reflection` doesn't have @@unique([userId, lessonId]). So multiple reflections possible.
-      // But UI assumes ONE note per lesson.
-      // I should probably clean up backend to only allow one or update latest.
-      // For this task, I'll just POST.
-      fetchData(); // Refresh to get IDs etc if needed
+      // In a real app, we might re-fetch or rely on optimistic UI logic
     } catch (e) {
       console.error("Save note failed", e);
     }
   };
 
   const handleDownloadStatusUpdate = async (lessonId: number) => {
-    // Toggle Bookmark
     try {
       const res = await fetch("/api/bookmarks", {
         method: "POST",
@@ -181,8 +159,22 @@ export default function Dashboard() {
     (n) => n.content.trim().length > 0
   ).length;
 
+  // --- Render Helpers ---
+
+  // Adapts API lesson shape to UI component shape
+  const mapToUiLesson = (lesson: any): Lesson => ({
+    ...lesson,
+    topicName: lesson.title,
+    surahName: lesson.surahReference
+      ? lesson.surahReference.replace(/Surah\s+| \(.*\)/g, "")
+      : "",
+    detailedDescription: lesson.detailedDescription || "",
+    tags: [],
+  });
+
   return (
-    <>
+    <div className="flex min-h-screen bg-zinc-950 text-zinc-100 font-sans selection:bg-emerald-500/30">
+      {/* Sidebar Navigation */}
       <Sidebar
         isOpen={mobileSidebarOpen}
         onClose={() => setMobileSidebarOpen(false)}
@@ -197,99 +189,121 @@ export default function Dashboard() {
         downloadsCount={downloadedIds.size}
       />
 
-      <main className="flex-1 min-h-screen bg-background relative w-full lg:ml-0 transition-all duration-300">
+      {/* Main Content Area */}
+      <main className="flex-1 relative w-full transition-all duration-300 min-h-screen flex flex-col">
         {/* Sticky Header */}
-        <header className="sticky top-0 z-30 bg-background/80 backdrop-blur-xl border-b border-border px-4 py-3 md:px-8 md:py-4">
-          <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
-            <div className="flex items-center gap-3">
+        <header className="sticky top-0 z-30 w-full border-b border-zinc-800 bg-zinc-950/80 backdrop-blur-xl supports-backdrop-filter:bg-zinc-950/60">
+          <div className="flex h-16 items-center justify-between px-4 md:px-8 max-w-[1600px] mx-auto">
+            {/* Left: Title & Toggle */}
+            <div className="flex items-center gap-4">
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={() => setMobileSidebarOpen(true)}
                 className="lg:hidden text-zinc-400 hover:text-white -ml-2"
               >
-                <Menu />
+                <Menu className="h-6 w-6" />
               </Button>
-              <h1 className="text-lg md:text-xl font-bold tracking-tight text-white flex items-center gap-2">
+
+              <div className="flex items-center gap-2">
                 {view === "home" && (
-                  <BookOpen className="w-5 h-5 text-emerald-500" />
+                  <BookOpen className="h-5 w-5 text-emerald-500" />
                 )}
-                {view === "home"
-                  ? "Syllabus"
-                  : view === "notes"
-                  ? "My Reflections"
-                  : "Offline Library"}
-              </h1>
+                {view === "notes" && (
+                  <Sparkles className="h-5 w-5 text-amber-500" />
+                )}
+                <h1 className="text-lg md:text-xl font-bold tracking-tight text-zinc-100 hidden sm:block">
+                  {view === "home"
+                    ? "Syllabus"
+                    : view === "notes"
+                    ? "My Reflections"
+                    : "Offline Library"}
+                </h1>
+              </div>
             </div>
 
-            <div className="relative flex-1 max-w-sm md:max-w-md ml-auto">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500 h-4 w-4" />
-              <Input
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder="Search..."
-                className="pl-9 h-9 md:h-10 bg-zinc-900/50 border-zinc-800 text-zinc-100 placeholder:text-zinc-600 focus-visible:ring-emerald-500 rounded-lg transition-all"
-              />
+            {/* Right: Search */}
+            <div className="flex items-center gap-4 flex-1 justify-end max-w-md ml-auto">
+              <div className="relative w-full max-w-[300px]">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
+                <Input
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  placeholder="Search lessons..."
+                  className="pl-9 h-9 bg-zinc-900/50 border-zinc-800 text-sm placeholder:text-zinc-600 focus-visible:ring-emerald-500/50 focus-visible:border-emerald-500 rounded-full transition-all"
+                />
+              </div>
             </div>
           </div>
 
+          {/* Sub-header: Categories (Mobile/Desktop Scroll) */}
           {view === "home" && (
-            <div className="mt-3 flex gap-2 overflow-x-auto pb-1 no-scrollbar lg:hidden mask-fade-right">
-              {CATEGORIES.map((cat) => (
-                <button
-                  key={cat}
-                  onClick={() => setFilterCategory(cat)}
-                  className={`whitespace-nowrap px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
-                    filterCategory === cat
-                      ? "bg-emerald-600 text-white shadow-lg shadow-emerald-900/20"
-                      : "bg-zinc-900 border border-zinc-800 text-zinc-400"
-                  }`}
-                >
-                  {cat === "All" ? "All Modules" : cat}
-                </button>
-              ))}
+            <div className="border-t border-zinc-800/50 bg-zinc-900/20">
+              <div className="max-w-[1600px] mx-auto">
+                <ScrollArea className="w-full whitespace-nowrap">
+                  <div className="flex w-max space-x-2 p-4 md:px-8">
+                    {CATEGORIES.map((cat) => (
+                      <button
+                        key={cat}
+                        onClick={() => setFilterCategory(cat)}
+                        className={`
+                            px-4 py-1.5 rounded-full text-xs font-medium transition-all duration-300 border
+                            ${
+                              filterCategory === cat
+                                ? "bg-emerald-600 border-emerald-500 text-white shadow-lg shadow-emerald-900/20"
+                                : "bg-zinc-900 border-zinc-800 text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200"
+                            }
+                          `}
+                      >
+                        {cat === "All" ? "All Modules" : cat}
+                      </button>
+                    ))}
+                  </div>
+                  <ScrollBar orientation="horizontal" className="invisible" />
+                </ScrollArea>
+              </div>
             </div>
           )}
         </header>
 
         {/* Content Grid */}
-        <div className="max-w-7xl mx-auto px-4 py-6 md:px-8 pb-24 md:pb-12">
+        <div className="flex-1 p-4 md:p-8 pb-32 md:pb-12 max-w-[1600px] mx-auto w-full">
           {isLoading ? (
-            <div className="flex justify-center py-20">Loading...</div>
-          ) : filteredData.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-24 text-zinc-500 animate-in fade-in zoom-in-95 duration-300">
-              <div className="w-16 h-16 bg-zinc-900 rounded-full flex items-center justify-center mb-4">
-                <Filter className="h-8 w-8 opacity-40" />
-              </div>
-              <p className="text-lg font-medium">No lessons found</p>
-              <p className="text-sm opacity-60">
-                Try adjusting your search or filters
+            <div className="flex h-[50vh] flex-col items-center justify-center gap-4 text-zinc-500">
+              <Loader2 className="h-10 w-10 animate-spin text-emerald-500" />
+              <p className="animate-pulse text-sm">
+                Loading your curriculum...
               </p>
             </div>
+          ) : filteredData.length === 0 ? (
+            <div className="flex h-[50vh] flex-col items-center justify-center gap-4 text-center animate-in fade-in zoom-in-95 duration-500">
+              <div className="flex h-20 w-20 items-center justify-center rounded-full bg-zinc-900 border border-zinc-800">
+                <Inbox className="h-10 w-10 text-zinc-600" />
+              </div>
+              <div className="space-y-1">
+                <h3 className="text-xl font-semibold text-zinc-200">
+                  No lessons found
+                </h3>
+                <p className="text-zinc-500 max-w-xs mx-auto">
+                  We couldn&apos;t find any lessons matching your current
+                  filters. Try adjusting your search.
+                </p>
+              </div>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setSearchTerm("");
+                  setFilterCategory("All");
+                }}
+                className="mt-4 border-zinc-700 hover:bg-zinc-800 hover:text-white"
+              >
+                Clear Filters
+              </Button>
+            </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {filteredData.map((lesson: any) => {
-                // Adapt Prisma Lesson to UI Lesson Interface
-                const uiLesson: Lesson = {
-                  ...lesson,
-                  topicName: lesson.title,
-                  // Parse surahName from surahReference if possible, or fallback
-                  // Seed format: "Surah Al-Asr (103)" -> Name: "Al-Asr"
-                  // If surahReference is null, use empty string
-                  surahName: lesson.surahReference
-                    ? lesson.surahReference.replace(/Surah\s+| \(.*\)/g, "")
-                    : "",
-                  // detailedDescription might be in lesson if schema has it (we added it to seed, assume schema has it or we added it to schema?)
-                  // Wait, did I add detailedDescription to Schema?
-                  // Checked schema.prisma in Step 11:
-                  // 101: detailedDescription String? @db.Text
-                  // Yes it is there.
-                  detailedDescription: lesson.detailedDescription || "",
-                  tags: [], // Schema doesn't have tags, strictly.
-                  // Constants Lesson interface has `tags: string[]`.
-                  // I will pass empty array or mapped if I had them.
-                };
-
+                const uiLesson = mapToUiLesson(lesson);
                 return (
                   <LessonCard
                     key={lesson.id}
@@ -305,7 +319,10 @@ export default function Dashboard() {
         </div>
       </main>
 
+      {/* Mobile Bottom Navigation */}
       <BottomNav activeView={view} onChangeView={setView} />
+
+      {/* --- Modals & Overlays --- */}
 
       {selectedLesson && !isEditingNote && !isViewingPdf && (
         <LessonDetail
@@ -337,6 +354,6 @@ export default function Dashboard() {
           onClose={() => setIsViewingPdf(false)}
         />
       )}
-    </>
+    </div>
   );
 }
