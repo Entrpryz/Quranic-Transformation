@@ -1,33 +1,40 @@
 import React from "react";
-import AdminSidebar from "@/components/AdminSidebar";
-import { getSession } from "@/lib/session";
 import { redirect } from "next/navigation";
 import { UserRole } from "@prisma/client";
+
+import AdminSidebar from "@/components/AdminSidebar";
+import { getSession } from "@/lib/session";
 
 export default async function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  // secure session check
   const session = await getSession();
-  console.log("AdminLayout Session:", session);
 
   if (!session || session.role !== UserRole.ADMIN) {
-    console.log(
-      "AdminLayout: Redirecting to /, session valid:",
-      !!session,
-      "role:",
-      session?.role
-    );
-    redirect("/"); // Or /login, but / prevents leaking admin existence slightly more? User implies redirect.
+    redirect("/");
   }
 
   return (
-    <div className="flex h-screen bg-black text-white overflow-hidden font-sans">
-      <AdminSidebar />
-      <main className="flex-1 overflow-y-auto bg-zinc-950 p-8">
-        <div className="max-w-6xl mx-auto">{children}</div>
-      </main>
+    <div className="flex h-screen w-full overflow-hidden bg-muted/40 font-sans text-foreground">
+      {/* Sidebar: 
+        Hidden on mobile by default (hidden md:block). 
+        You would typically add a Sheet/Drawer component for mobile navigation.
+      */}
+      <aside className="hidden border-r bg-background md:block">
+        <AdminSidebar className="h-full" />
+      </aside>
+
+      {/* Main Content Area */}
+      <div className="flex flex-1 flex-col overflow-hidden">
+        <main className="flex-1 overflow-y-auto">
+          <div className="container mx-auto max-w-7xl p-4 md:p-8 lg:p-10">
+            {children}
+          </div>
+        </main>
+      </div>
     </div>
   );
 }
