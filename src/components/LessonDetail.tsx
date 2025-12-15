@@ -1,4 +1,5 @@
 "use client";
+
 import React from "react";
 import {
   X,
@@ -7,11 +8,19 @@ import {
   FileText,
   CheckCircle2,
   Sparkles,
+  BookOpen,
 } from "lucide-react";
 import { Lesson, getDownloadUrl } from "@/lib/constants";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface LessonDetailProps {
   lesson: Lesson;
@@ -47,107 +56,159 @@ const LessonDetail: React.FC<LessonDetailProps> = ({
 
   return (
     <Dialog open={true} onOpenChange={onClose}>
-      {/* CRITICAL FIX: [&>button]:hidden removes the default Close (X) provided by Radix UI
-         This prevents the duplicate "X" button issue.
+      {/* Custom DialogContent styles:
+        - Hiding default close button to use our custom one in the header
+        - Max-width and height adjustments for responsive design
       */}
-      <DialogContent className="bg-zinc-950 border-zinc-800 text-zinc-100 max-w-2xl p-0 gap-0 overflow-hidden outline-none [&>button]:hidden shadow-2xl shadow-black/80">
-        {/* Header */}
-        <div className="p-6 border-b border-zinc-800 flex justify-between items-start bg-zinc-900/30 backdrop-blur-sm">
-          <div className="space-y-3">
-            <div className="flex gap-2">
-              <Badge className="bg-emerald-500/10 text-emerald-400 border-emerald-500/20 hover:bg-emerald-500/20 rounded-md">
+      <DialogContent className="max-w-3xl p-0 gap-0 bg-zinc-950 border-zinc-800 text-zinc-100 overflow-hidden outline-none [&>button]:hidden shadow-2xl shadow-black/90">
+        {/* --- Header Section --- */}
+        <div className="relative p-6 md:p-8 pb-6 border-b border-zinc-800 bg-zinc-900/50 backdrop-blur-md">
+          {/* Close Button */}
+          <div className="absolute top-4 right-4 z-10">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={onClose}
+              className="h-8 w-8 rounded-full text-zinc-400 hover:text-white hover:bg-zinc-800"
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          </div>
+
+          <div className="space-y-4">
+            {/* Metadata Badges */}
+            <div className="flex flex-wrap items-center gap-2">
+              <Badge
+                variant="secondary"
+                className="bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 border-emerald-500/20 px-3 py-1"
+              >
                 {lesson.part}
               </Badge>
               <Badge
                 variant="outline"
-                className="border-zinc-700 text-zinc-400"
+                className="border-zinc-700 text-zinc-400 font-mono text-xs"
               >
-                ID: {lesson.id}
+                #{lesson.id.toString().padStart(3, "0")}
               </Badge>
+              {isDownloaded && (
+                <Badge
+                  variant="secondary"
+                  className="bg-zinc-800 text-zinc-400 gap-1"
+                >
+                  <CheckCircle2 className="w-3 h-3" /> Offline Ready
+                </Badge>
+              )}
             </div>
-            <h2 className="text-xl md:text-2xl font-bold leading-tight pr-4 text-white">
-              {lesson.topicName}
-            </h2>
-            <div className="flex items-center gap-3 text-sm text-zinc-400">
-              <span className="flex items-center gap-1.5">
-                <Clock size={14} /> {lesson.hours}h
-              </span>
-              <span className="w-1 h-1 rounded-full bg-zinc-700" />
-              <span>{lesson.surahName}</span>
-            </div>
-          </div>
-          <button
-            onClick={onClose}
-            className="rounded-full p-2 bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-white transition-all border border-zinc-800"
-          >
-            <X size={20} />
-          </button>
-        </div>
 
-        {/* Scrollable Body */}
-        <div className="p-6 md:p-8 space-y-6 max-h-[60vh] overflow-y-auto custom-scrollbar bg-zinc-950">
-          <div className="bg-linear-to-l from-emerald-950/20 to-zinc-900/20 p-6 rounded-xl border border-zinc-800/50">
-            {/* Urdu Title - Prominent */}
-            <h3 className="font-gulzar text-3xl md:text-4xl text-right text-emerald-400 mb-6 leading-normal drop-shadow-md">
-              {lesson.urduTitle}
-            </h3>
-            <div className="w-full h-px bg-linear-to-r from-transparent via-zinc-800 to-transparent mb-6"></div>
-            <p className="text-zinc-300 leading-relaxed text-base md:text-lg">
-              {lesson.detailedDescription || lesson.description}
-            </p>
+            {/* Title Block */}
+            <div>
+              <h2 className="text-2xl md:text-3xl font-bold text-white leading-tight tracking-tight mb-2">
+                {lesson.topicName}
+              </h2>
+              <div className="flex items-center gap-4 text-sm text-zinc-400 font-medium">
+                <div className="flex items-center gap-1.5">
+                  <Clock className="w-4 h-4 text-zinc-500" />
+                  <span>{lesson.hours}h Duration</span>
+                </div>
+                <div className="w-1 h-1 rounded-full bg-zinc-700" />
+                <div className="flex items-center gap-1.5">
+                  <BookOpen className="w-4 h-4 text-zinc-500" />
+                  <span>{lesson.surahName}</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* Footer Actions */}
-        <div className="p-6 bg-zinc-900/50 border-t border-zinc-800 flex flex-col sm:flex-row gap-3 backdrop-blur-md">
+        {/* --- Scrollable Content --- */}
+        <ScrollArea className="max-h-[60vh] md:max-h-[500px] w-full bg-zinc-950">
+          <div className="p-6 md:p-8 space-y-8">
+            {/* Hero: Urdu Title */}
+            <div className="relative overflow-hidden rounded-xl border border-emerald-900/30 bg-linear-to-br from-emerald-950/20 to-zinc-900/50 p-8 text-center md:text-right">
+              <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-emerald-500/0 via-emerald-500/50 to-emerald-500/0 opacity-50" />
+
+              <h3 className="font-gulzar text-4xl md:text-5xl text-emerald-100/90 leading-[1.6] drop-shadow-md dir-rtl">
+                {lesson.urduTitle}
+              </h3>
+            </div>
+
+            {/* Description */}
+            <div className="space-y-4">
+              <h4 className="text-sm font-semibold uppercase tracking-wider text-zinc-500">
+                Lesson Overview
+              </h4>
+              <div className="prose prose-invert prose-zinc max-w-none">
+                <p className="text-zinc-300 leading-relaxed text-base md:text-lg">
+                  {lesson.detailedDescription || lesson.description}
+                </p>
+              </div>
+            </div>
+          </div>
+        </ScrollArea>
+
+        {/* --- Footer Actions --- */}
+        <div className="p-6 bg-zinc-900 border-t border-zinc-800 flex flex-col sm:flex-row gap-4 items-center justify-between">
+          {/* Primary Action: Notes */}
           <Button
             onClick={onOpenNote}
-            className="flex-1 bg-amber-600 hover:bg-amber-700 text-white shadow-lg shadow-amber-900/20 h-11"
+            className={`w-full sm:w-auto min-w-[180px] h-11 text-base font-medium shadow-lg transition-all ${
+              hasNote
+                ? "bg-amber-600 hover:bg-amber-700 text-white shadow-amber-900/20"
+                : "bg-zinc-100 text-zinc-900 hover:bg-white"
+            }`}
           >
             {hasNote ? (
-              <span className="flex items-center gap-2">
-                <FileText size={16} /> Edit Reflection
-              </span>
+              <>
+                <FileText className="mr-2 h-4 w-4" /> Edit Reflection
+              </>
             ) : (
-              <span className="flex items-center gap-2">
-                <Sparkles size={16} /> Add Reflection
-              </span>
+              <>
+                <Sparkles className="mr-2 h-4 w-4" /> Add Reflection
+              </>
             )}
           </Button>
 
+          {/* Secondary Actions Group */}
           {lesson.presentationLink && (
-            <>
-              <Button
-                onClick={onOpenPdf}
-                variant="secondary"
-                className="flex-1 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 h-11"
-              >
-                <FileText className="mr-2 h-4 w-4" /> Read PDF
-              </Button>
+            <div className="flex w-full sm:w-auto gap-3">
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      onClick={onOpenPdf}
+                      variant="secondary"
+                      className="flex-1 sm:flex-none h-11 bg-zinc-800 hover:bg-zinc-700 text-zinc-200"
+                    >
+                      <BookOpen className="mr-2 h-4 w-4" /> Read PDF
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>View presentation slides</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
 
               <Button
                 onClick={handleForceDownload}
                 variant="outline"
-                className={`flex-1 border-zinc-700 h-11 ${
+                className={`flex-1 sm:flex-none h-11 border-zinc-700 transition-colors ${
                   isDownloaded
-                    ? "text-emerald-500 border-emerald-500/50 bg-emerald-500/10"
-                    : "text-zinc-300 hover:text-white hover:bg-zinc-800"
+                    ? "text-emerald-500 border-emerald-500/30 bg-emerald-500/10 hover:bg-emerald-500/20"
+                    : "text-zinc-400 hover:text-white hover:bg-zinc-800"
                 }`}
                 disabled={isDownloaded}
               >
                 {isDownloaded ? (
                   <>
-                    {" "}
-                    <CheckCircle2 className="mr-2 h-4 w-4" /> Saved{" "}
+                    <CheckCircle2 className="mr-2 h-4 w-4" /> Saved
                   </>
                 ) : (
                   <>
-                    {" "}
-                    <Download className="mr-2 h-4 w-4" /> Download{" "}
+                    <Download className="mr-2 h-4 w-4" /> Download
                   </>
                 )}
               </Button>
-            </>
+            </div>
           )}
         </div>
       </DialogContent>
