@@ -4,12 +4,10 @@ import React, { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import {
   Mail,
-  ArrowRight,
   CheckCircle2,
   Loader2,
   ExternalLink,
 } from "lucide-react";
-import { motion } from "framer-motion";
 
 import { Button } from "@/components/ui/button";
 import {
