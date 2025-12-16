@@ -51,6 +51,7 @@ export default function RegisterPage() {
       const result = await response.json();
       if (!response.ok) throw new Error(result.error || "Something went wrong");
       setSuccess(result.message);
+      router.push("/auth/check-email?email=" + encodeURIComponent(data.email as string));
       event.currentTarget.reset();
     } catch (err) {
       setError(
@@ -69,36 +70,6 @@ export default function RegisterPage() {
     <div className="flex min-h-[80vh] w-full items-center justify-center px-4">
       <Card className="w-full max-w-md border-zinc-800 bg-zinc-950/50 shadow-xl backdrop-blur-sm">
         <AnimatePresence mode="wait">
-          {success ? (
-            <motion.div
-              key="success"
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              transition={{ duration: 0.3 }}
-            >
-              <CardHeader className="text-center pb-2">
-                <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-emerald-500/10 border border-emerald-500/20 shadow-[0_0_40px_-10px_rgba(16,185,129,0.3)]">
-                  <CheckCircle2 className="h-8 w-8 text-emerald-500" />
-                </div>
-                <CardTitle className="text-2xl font-gulzar tracking-wide text-white">
-                  Check Your Email
-                </CardTitle>
-                <CardDescription className="text-zinc-400">
-                  {success}
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="pb-6">
-                <Button
-                  variant="outline"
-                  className="w-full border-zinc-800 bg-zinc-900 text-zinc-300 hover:bg-zinc-800 hover:text-white"
-                  onClick={() => router.push("/auth/login")}
-                >
-                  Return to Login
-                </Button>
-              </CardContent>
-            </motion.div>
-          ) : (
             <motion.div
               key="form"
               initial={{ opacity: 0, y: 10 }}
