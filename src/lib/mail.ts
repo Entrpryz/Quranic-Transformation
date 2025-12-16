@@ -11,10 +11,6 @@ const transporter = nodemailer.createTransport({
     user: EMAIL_USER,
     pass: EMAIL_PASS,
   },
-  // Keep the timeouts as good practice
-  connectionTimeout: 10000,
-  greetingTimeout: 5000,
-  socketTimeout: 10000,
 });
 
 // OPTIMIZATION: Generic email sending function to avoid code duplication
