@@ -30,28 +30,53 @@ export default function RegisterPage() {
 
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    console.log("🖱️ [Register Page] Form submitted");
+
     setIsLoading(true);
     setError(null);
     setSuccess(null);
     const formData = new FormData(event.currentTarget);
     const data = Object.fromEntries(formData);
+    console.log("📝 [Register Page] Form data collected:", {
+      ...data,
+      password: "***",
+    });
 
     try {
+      console.log(
+        "🚀 [Register Page] Sending POST request to /api/auth/register..."
+      );
       const response = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
       });
+      console.log(
+        "📥 [Register Page] Response received. Status:",
+        response.status
+      );
+
       const result = await response.json();
-      if (!response.ok) throw new Error(result.error || "Something went wrong");
+      console.log("📥 [Register Page] Response parsed:", result);
+
+      if (!response.ok) {
+        console.error("❌ [Register Page] Request failed:", result.error);
+        throw new Error(result.error || "Something went wrong");
+      }
+
+      console.log("✅ [Register Page] Registration success. Redirecting...");
       setSuccess(result.message);
-      // router.push("/auth/check-email?email=" + encodeURIComponent(data.email as string));
+      router.push(
+        "/auth/check-email?email=" + encodeURIComponent(data.email as string)
+      );
       event.currentTarget.reset();
     } catch (err) {
+      console.error("❌ [Register Page] Catch block error:", err);
       setError(
         err instanceof Error ? err.message : "An unknown error occurred"
       );
     } finally {
+      console.log("🏁 [Register Page] Request completed (finally block)");
       setIsLoading(false);
     }
   }
