@@ -1,0 +1,27 @@
+name: Sync to Entrpryz
+
+on:
+  push:
+    branches:
+      - main # Set this to your default branch
+  workflow_dispatch: # Allows you to run this button manually if needed
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Personal Repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Fetch all history for proper syncing
+
+      - name: Push to Entrpryz Organization
+        uses: cpina/github-action-push-to-another-repository@main
+        env:
+          API_TOKEN_GITHUB: ${{ secrets.ENTRPRYZ_SYNC_TOKEN }}
+        with:
+          source-directory: "."
+          destination-github-username: "Entrpryz"
+          destination-repository-name: "Quranic-Transformation" # Replace with the exact repo name
+          user-email: "itswaleedqureshi@gmail.com" # Your email for the commit
+          target-branch: main
