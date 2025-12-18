@@ -17,11 +17,14 @@ if (!EMAIL_USER || !EMAIL_PASS) {
 
 const transporter = nodemailer.createTransport({
   host: "smtp.gmail.com",
-  port: 465,
-  secure: true,
+  port: 587, // Changed from 465
+  secure: false, // Changed from true (true is only for port 465)
   auth: {
     user: EMAIL_USER,
     pass: EMAIL_PASS,
+  },
+  tls: {
+    ciphers: "SSLv3", // specific fix for some node/docker environments
   },
 });
 
