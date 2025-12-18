@@ -97,6 +97,11 @@ const LessonCard: React.FC<LessonCardProps> = ({
 
           <div className="space-y-1.5">
             <h4 className="text-lg font-semibold text-zinc-100 leading-snug tracking-tight group-hover:text-white transition-colors line-clamp-2">
+              {lesson.surahNo && (
+                <span className="text-emerald-500/80 font-mono mr-2">
+                  {lesson.surahNo}.
+                </span>
+              )}
               {lesson.topicName}
             </h4>
             <div className="flex items-center gap-2 text-xs font-mono text-zinc-600">
