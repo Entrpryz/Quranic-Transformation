@@ -9,6 +9,12 @@ console.log("📧 [Mail Lib] Domain:", domain);
 console.log("📧 [Mail Lib] Email User present:", !!EMAIL_USER);
 console.log("📧 [Mail Lib] Email Pass present:", !!EMAIL_PASS);
 
+if (!EMAIL_USER || !EMAIL_PASS) {
+  console.error("❌ [Mail Lib] CRITICAL ERROR: Missing Email Credentials!");
+  console.error("❌ [Mail Lib] Make sure EMAIL_USER and EMAIL_PASS are set in your .env file (or production variables).");
+  throw new Error("Missing EMAIL_USER or EMAIL_PASS environment variables.");
+}
+
 const transporter = nodemailer.createTransport({
   host: "smtp.gmail.com",
   port: 465,
