@@ -3,7 +3,10 @@ import { SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
-const secretKey = process.env.NEXT_PUBLIC_JWT_SECRET || "your-secret-key-change-this";
+const secretKey = process.env.JWT_SECRET
+if (!secretKey) {
+  throw new Error("Can not find JWT_SECRET in environment variables")
+}
 const key = new TextEncoder().encode(secretKey);
 
 export async function encrypt(payload: any) {
@@ -23,7 +26,7 @@ export async function decrypt(input: string): Promise<any> {
     return payload;
   } catch (error) {
     console.log("Session Decrypt Error:", error);
-    console.log("Secret Key Used (starts with):", secretKey.substring(0, 3));
+    console.log("Secret Key Used (starts with):", secretKey?.substring(0, 3));
     console.log("Input token (starts with):", input.substring(0, 10));
     return null;
   }
