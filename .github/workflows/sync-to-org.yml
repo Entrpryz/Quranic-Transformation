@@ -17,9 +17,6 @@ jobs:
 
       - name: Push to Entrpryz Organization
         uses: cpina/github-action-push-to-another-repository@main
-        with:
-          fetch-depth: 0
-          persist-credentials: false # <--- ADD THIS LINE
         env:
           API_TOKEN_GITHUB: ${{ secrets.ENTRPRYZ_SYNC_TOKEN }}
         with:
@@ -28,3 +25,5 @@ jobs:
           destination-repository-name: "Quranic-Transformation" # Replace with the exact repo name
           user-email: "itswaleedqureshi@gmail.com" # Your email for the commit
           target-branch: main
+          fetch-depth: 0
+          persist-credentials: false # <--- ADD THIS LINE
