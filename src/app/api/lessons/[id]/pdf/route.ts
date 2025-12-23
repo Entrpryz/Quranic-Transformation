@@ -17,14 +17,26 @@ export async function GET(
 
     const lesson = await prisma.lesson.findUnique({
       where: { id: lessonId },
-      select: { presentationLink: true },
+      select: {
+        resources: {
+          where: { type: "PDF" },
+          select: { url: true },
+          take: 1,
+        },
+      },
     });
 
     if (!lesson) {
       return NextResponse.json({ error: "Lesson not found" }, { status: 404 });
     }
 
-    return NextResponse.json({ url: lesson.presentationLink });
+    const pdfResource = lesson.resources[0];
+
+    if (!pdfResource) {
+      return NextResponse.json({ error: "PDF resource not found" }, { status: 404 });
+    }
+
+    return NextResponse.json({ url: pdfResource.url });
   } catch (error) {
     console.error("Error fetching PDF URL:", error);
     return NextResponse.json(
