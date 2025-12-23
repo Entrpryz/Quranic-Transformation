@@ -105,9 +105,11 @@ model Lesson {
   surahNo        String?
   verses         String?
   part           String // Category
+  hours          String?
 
   // Content Assets (Primary)
-  audioUrl String?
+  audioUrl         String?
+  presentationLink String?
 
   // Access Control
   minRole UserRole @default(USER)
