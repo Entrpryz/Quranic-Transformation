@@ -19,8 +19,6 @@ export async function GET() {
   }
 }
 
-// ... POST method remains the same ...
-
 export async function POST(req: Request) {
   const { error } = await requireAdmin();
   if (error) return error;
