@@ -88,23 +88,27 @@ const LessonCard: React.FC<LessonCardProps> = ({
         </CardHeader>
 
         <CardContent className="flex-1 space-y-4 p-5 pt-2 relative z-10">
-          {/* Urdu Title - Preserved Font & Styling */}
-          <div className="flex justify-end">
-            <h3 className="font-gulzar text-2xl md:text-3xl text-right text-emerald-100/90 leading-[1.6] drop-shadow-sm group-hover:text-emerald-400 transition-colors duration-300 dir-rtl">
-              {lesson.urduTitle}
-            </h3>
-          </div>
+          <div className="space-y-3">
+            {/* English Title - Primary & Prominent */}
+            <div>
+              <h3 className="text-xl md:text-2xl font-bold text-zinc-100 leading-tight tracking-tight group-hover:text-white transition-colors line-clamp-2 mb-1">
+                {lesson.topicName}
+              </h3>
 
-          <div className="space-y-1.5">
-            <h4 className="text-lg font-semibold text-zinc-100 leading-snug tracking-tight group-hover:text-white transition-colors line-clamp-2">
+              {/* Urdu Title - Secondary & Supplementary */}
+              <p className="font-gulzar text-lg text-emerald-500/80 leading-snug dir-rtl">
+                {lesson.urduTitle}
+              </p>
+            </div>
+
+            <div className="flex items-center gap-2 text-xs font-mono text-zinc-600">
               {lesson.surahNo && (
-                <span className="text-emerald-500/80 font-mono mr-2">
+                <span className="text-emerald-500/60 font-mono">
                   {lesson.surahNo}.
                 </span>
               )}
-              {lesson.surahName}
-            </h4>
-            <div className="flex items-center gap-2 text-xs font-mono text-zinc-600">
+              <span>{lesson.surahName}</span>
+              <span className="text-zinc-700 mx-1">•</span>
               <span>ID: #{lesson.id.toString().padStart(3, "0")}</span>
             </div>
           </div>

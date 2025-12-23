@@ -117,10 +117,14 @@ const LessonDetail: React.FC<LessonDetailProps> = ({
 
             {/* Title Block */}
             <div>
-              <h2 className="text-2xl md:text-3xl font-bold text-white leading-tight tracking-tight mb-2">
+              <h2 className="text-3xl md:text-4xl font-bold text-white leading-tight tracking-tight mb-2">
                 {lesson.topicName}
               </h2>
-              <div className="flex items-center gap-4 text-sm text-zinc-400 font-medium">
+              <p className="font-gulzar text-xl md:text-2xl text-emerald-400/90 leading-relaxed dir-rtl mb-4">
+                {lesson.urduTitle}
+              </p>
+
+              <div className="flex items-center gap-4 text-sm text-zinc-400 font-medium border-t border-zinc-800/50 pt-4">
                 <div className="flex items-center gap-1.5">
                   <Clock className="w-4 h-4 text-zinc-500" />
                   <span>{lesson.hours}h Duration</span>
@@ -138,15 +142,6 @@ const LessonDetail: React.FC<LessonDetailProps> = ({
         {/* --- Scrollable Content --- */}
         <ScrollArea className="max-h-[60vh] md:max-h-[500px] w-full bg-zinc-950">
           <div className="p-6 md:p-8 space-y-8">
-            {/* Hero: Urdu Title */}
-            <div className="relative overflow-hidden rounded-xl border border-emerald-900/30 bg-linear-to-br from-emerald-950/20 to-zinc-900/50 p-8 text-center md:text-right">
-              <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-emerald-500/0 via-emerald-500/50 to-emerald-500/0 opacity-50" />
-
-              <h3 className="font-gulzar text-4xl md:text-5xl text-emerald-100/90 leading-[1.6] drop-shadow-md dir-rtl">
-                {lesson.urduTitle}
-              </h3>
-            </div>
-
             {/* Description */}
             <div className="space-y-4">
               <h4 className="text-sm font-semibold uppercase tracking-wider text-zinc-500">
