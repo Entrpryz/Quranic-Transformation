@@ -10,6 +10,9 @@ import {
   Loader2,
   Save,
   MoreVertical,
+  FileText,
+  Link as LinkIcon,
+  Video,
 } from "lucide-react";
 
 // Shadcn UI Imports
@@ -18,6 +21,7 @@ import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
+  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -43,19 +47,28 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Separator } from "@/components/ui/separator";
 
-// Type definition for strict safety
+// --- Types ---
+interface Resource {
+  id: string;
+  lessonId: number;
+  title: string;
+  url: string;
+  type: "PDF" | "LINK" | "VIDEO" | "TEXT";
+}
+
 interface Lesson {
   id?: number;
   title: string;
   part: string;
   description: string;
+  detailedDescription?: string;
   audioUrl: string;
   minRole: "USER" | "ADMIN";
+  resources?: Resource[];
 }
 
 export default function LessonsPage() {
@@ -63,15 +76,26 @@ export default function LessonsPage() {
   const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
 
-  // Initialize with a proper default object structure
+  // -- Edit State --
   const [editingLesson, setEditingLesson] = useState<Lesson>({
     title: "",
     part: "",
     description: "",
+    detailedDescription: "",
     audioUrl: "",
     minRole: "USER",
+    resources: [],
   });
 
+  // -- Resource Form State --
+  const [newResource, setNewResource] = useState({
+    title: "",
+    url: "",
+    type: "PDF",
+  });
+  const [isAddingResource, setIsAddingResource] = useState(false);
+
+  // --- Fetching ---
   const fetchLessons = async () => {
     try {
       const res = await fetch("/api/admin/lessons");
@@ -90,13 +114,16 @@ export default function LessonsPage() {
     fetchLessons();
   }, []);
 
+  // --- Handlers ---
   const handleCreate = () => {
     setEditingLesson({
       title: "",
       part: "",
       description: "",
+      detailedDescription: "",
       audioUrl: "",
       minRole: "USER",
+      resources: [],
     });
     setIsEditing(true);
   };
@@ -116,7 +143,7 @@ export default function LessonsPage() {
     }
   };
 
-  const handleSave = async (e: React.FormEvent) => {
+  const handleSaveLesson = async (e: React.FormEvent) => {
     e.preventDefault();
     const isNew = !editingLesson.id;
     const url = isNew
@@ -133,7 +160,7 @@ export default function LessonsPage() {
       const data = await res.json();
       if (res.ok) {
         setIsEditing(false);
-        fetchLessons(); // Refresh list
+        fetchLessons();
       } else {
         alert(data.error || "Save failed");
       }
@@ -142,7 +169,71 @@ export default function LessonsPage() {
     }
   };
 
-  // Loading State
+  // --- Resource Handlers ---
+  const handleAddResource = async () => {
+    if (!editingLesson.id) {
+      alert("Please save the lesson first before adding resources.");
+      return;
+    }
+    if (!newResource.title || !newResource.url) return;
+
+    setIsAddingResource(true);
+    try {
+      const res = await fetch("/api/admin/resources", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          lessonId: editingLesson.id,
+          ...newResource,
+        }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setEditingLesson((prev) => ({
+          ...prev,
+          resources: [...(prev.resources || []), data.resource],
+        }));
+        setNewResource({ title: "", url: "", type: "PDF" });
+      } else {
+        alert(data.error);
+      }
+    } catch {
+      alert("Failed to add resource");
+    } finally {
+      setIsAddingResource(false);
+    }
+  };
+
+  const handleDeleteResource = async (resourceId: string) => {
+    if (!confirm("Remove this resource?")) return;
+    try {
+      const res = await fetch(`/api/admin/resources/${resourceId}`, {
+        method: "DELETE",
+      });
+      if (res.ok) {
+        setEditingLesson((prev) => ({
+          ...prev,
+          resources: prev.resources?.filter((r) => r.id !== resourceId),
+        }));
+      }
+    } catch {
+      alert("Failed to delete resource");
+    }
+  };
+
+  // --- Helpers ---
+  const getIconForType = (type: string) => {
+    switch (type) {
+      case "PDF":
+        return <FileText className="h-4 w-4 text-red-500" />;
+      case "VIDEO":
+        return <Video className="h-4 w-4 text-blue-500" />;
+      default:
+        return <LinkIcon className="h-4 w-4 text-slate-500" />;
+    }
+  };
+
+  // --- Views ---
   if (loading) {
     return (
       <div className="flex h-[50vh] w-full items-center justify-center">
@@ -151,11 +242,12 @@ export default function LessonsPage() {
     );
   }
 
-  // Edit / Create View
+  // === Edit / Create View ===
   if (isEditing) {
     return (
-      <div className="mx-auto max-w-3xl py-8">
-        <div className="mb-6 flex items-center gap-4">
+      <div className="mx-auto max-w-4xl py-8 space-y-6">
+        {/* Header */}
+        <div className="flex items-center gap-4">
           <Button
             variant="outline"
             size="icon"
@@ -166,137 +258,289 @@ export default function LessonsPage() {
           </Button>
           <div>
             <h2 className="text-2xl font-bold tracking-tight">
-              {editingLesson.id ? "Edit Lesson" : "Create New Lesson"}
+              {editingLesson.id ? "Edit Lesson Content" : "Create New Lesson"}
             </h2>
-            <p className="text-muted-foreground">
-              {editingLesson.id
-                ? "Update lesson details and access controls."
-                : "Add a new lesson to the curriculum."}
-            </p>
           </div>
         </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Lesson Details</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSave} className="space-y-6">
-              <div className="grid gap-6 md:grid-cols-2">
-                <div className="space-y-2">
-                  <Label htmlFor="title">Lesson Title</Label>
-                  <Input
-                    id="title"
-                    placeholder="e.g. Introduction to React"
-                    value={editingLesson.title}
-                    onChange={(e) =>
-                      setEditingLesson({
-                        ...editingLesson,
-                        title: e.target.value,
-                      })
-                    }
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="part">Category / Part</Label>
-                  <Input
-                    id="part"
-                    placeholder="e.g. Module 1"
-                    value={editingLesson.part}
-                    onChange={(e) =>
-                      setEditingLesson({
-                        ...editingLesson,
-                        part: e.target.value,
-                      })
-                    }
-                    required
-                  />
-                </div>
-              </div>
+        <form onSubmit={handleSaveLesson}>
+          <div className="grid gap-6 md:grid-cols-3">
+            {/* Main Details Column */}
+            <div className="md:col-span-2 space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Lesson Details</CardTitle>
+                  <CardDescription>
+                    Basic information and audio.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="title">Lesson Title</Label>
+                    <Input
+                      id="title"
+                      placeholder="e.g. Introduction to Quran"
+                      value={editingLesson.title}
+                      onChange={(e) =>
+                        setEditingLesson({
+                          ...editingLesson,
+                          title: e.target.value,
+                        })
+                      }
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="description">Short Summary</Label>
+                    <Textarea
+                      id="description"
+                      placeholder="Brief overview..."
+                      value={editingLesson.description}
+                      onChange={(e) =>
+                        setEditingLesson({
+                          ...editingLesson,
+                          description: e.target.value,
+                        })
+                      }
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="detailed">Full Content (Text)</Label>
+                    <Textarea
+                      id="detailed"
+                      placeholder="Detailed lesson notes, transcript, etc."
+                      className="min-h-[150px]"
+                      value={editingLesson.detailedDescription || ""}
+                      onChange={(e) =>
+                        setEditingLesson({
+                          ...editingLesson,
+                          detailedDescription: e.target.value,
+                        })
+                      }
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="audioUrl">Main Audio URL</Label>
+                    <Input
+                      id="audioUrl"
+                      placeholder="https://..."
+                      value={editingLesson.audioUrl}
+                      onChange={(e) =>
+                        setEditingLesson({
+                          ...editingLesson,
+                          audioUrl: e.target.value,
+                        })
+                      }
+                    />
+                  </div>
+                </CardContent>
+              </Card>
 
-              <div className="space-y-2">
-                <Label htmlFor="description">Description</Label>
-                <Textarea
-                  id="description"
-                  placeholder="Summarize the content of this lesson..."
-                  className="min-h-[120px] resize-y"
-                  value={editingLesson.description}
-                  onChange={(e: { target: { value: any; }; }) =>
-                    setEditingLesson({
-                      ...editingLesson,
-                      description: e.target.value,
-                    })
-                  }
-                />
-              </div>
+              {/* Resources Section (Only show if lesson exists) */}
+              {editingLesson.id ? (
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Course Materials</CardTitle>
+                    <CardDescription>
+                      Manage PDFs, links, and extra videos for this lesson.
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-6">
+                    {/* Add Resource Form */}
+                    <div className="flex flex-col gap-3 rounded-md border p-4 bg-muted/20">
+                      <Label className="text-xs font-semibold uppercase text-muted-foreground">
+                        Add New Resource
+                      </Label>
+                      <div className="flex flex-col gap-2 md:flex-row">
+                        <Input
+                          placeholder="Title (e.g. Worksheet PDF)"
+                          className="flex-1"
+                          value={newResource.title}
+                          onChange={(e) =>
+                            setNewResource({
+                              ...newResource,
+                              title: e.target.value,
+                            })
+                          }
+                        />
+                        <Select
+                          value={newResource.type}
+                          onValueChange={(val: any) =>
+                            setNewResource({ ...newResource, type: val })
+                          }
+                        >
+                          <SelectTrigger className="w-[120px]">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="PDF">PDF</SelectItem>
+                            <SelectItem value="LINK">Link</SelectItem>
+                            <SelectItem value="VIDEO">Video</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="flex gap-2">
+                        <Input
+                          placeholder="URL (https://...)"
+                          value={newResource.url}
+                          onChange={(e) =>
+                            setNewResource({
+                              ...newResource,
+                              url: e.target.value,
+                            })
+                          }
+                        />
+                        <Button
+                          type="button"
+                          onClick={handleAddResource}
+                          disabled={
+                            isAddingResource ||
+                            !newResource.title ||
+                            !newResource.url
+                          }
+                        >
+                          {isAddingResource ? (
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                          ) : (
+                            <Plus className="h-4 w-4" />
+                          )}
+                        </Button>
+                      </div>
+                    </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="audioUrl">Audio / Resource URL</Label>
-                <Input
-                  id="audioUrl"
-                  placeholder="https://..."
-                  value={editingLesson.audioUrl}
-                  onChange={(e) =>
-                    setEditingLesson({
-                      ...editingLesson,
-                      audioUrl: e.target.value,
-                    })
-                  }
-                />
-              </div>
+                    <Separator />
 
-              <div className="space-y-2 rounded-lg border border-border bg-muted/30 p-4">
-                <Label className="text-base font-semibold">
-                  Access Control
-                </Label>
-                <p className="mb-3 text-sm text-muted-foreground">
-                  Determine who can view this lesson content.
-                </p>
-                <Select
-                  value={editingLesson.minRole}
-                  onValueChange={(val: "USER" | "ADMIN") =>
-                    setEditingLesson({ ...editingLesson, minRole: val })
-                  }
-                >
-                  <SelectTrigger className="w-full md:w-[240px] bg-background">
-                    <SelectValue placeholder="Select Role" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="USER">All Users</SelectItem>
-                    <SelectItem value="ADMIN">Admins Only</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+                    {/* Resources List */}
+                    <div className="space-y-2">
+                      <Label>Attached Resources</Label>
+                      {!editingLesson.resources ||
+                      editingLesson.resources.length === 0 ? (
+                        <p className="text-sm text-muted-foreground italic">
+                          No resources added yet.
+                        </p>
+                      ) : (
+                        <div className="grid gap-2">
+                          {editingLesson.resources.map((res) => (
+                            <div
+                              key={res.id}
+                              className="flex items-center justify-between rounded-md border p-3"
+                            >
+                              <div className="flex items-center gap-3 overflow-hidden">
+                                <div className="rounded-full bg-muted p-2">
+                                  {getIconForType(res.type)}
+                                </div>
+                                <div className="grid gap-0.5">
+                                  <span className="text-sm font-medium truncate">
+                                    {res.title}
+                                  </span>
+                                  <a
+                                    href={res.url}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="text-xs text-muted-foreground hover:underline truncate max-w-[200px]"
+                                  >
+                                    {res.url}
+                                  </a>
+                                </div>
+                              </div>
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleDeleteResource(res.id)}
+                                className="text-destructive hover:bg-destructive/10"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              ) : (
+                <Card className="bg-muted/50 border-dashed">
+                  <CardContent className="flex flex-col items-center justify-center py-8 text-center">
+                    <p className="text-sm text-muted-foreground">
+                      Save the lesson basic details first to add resources.
+                    </p>
+                  </CardContent>
+                </Card>
+              )}
+            </div>
 
-              <div className="flex justify-end gap-3 pt-4">
+            {/* Sidebar Column */}
+            <div className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Organization</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="part">Category / Module</Label>
+                    <Input
+                      id="part"
+                      placeholder="e.g. Module 1"
+                      value={editingLesson.part}
+                      onChange={(e) =>
+                        setEditingLesson({
+                          ...editingLesson,
+                          part: e.target.value,
+                        })
+                      }
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Access Control</Label>
+                    <Select
+                      value={editingLesson.minRole}
+                      onValueChange={(val: "USER" | "ADMIN") =>
+                        setEditingLesson({ ...editingLesson, minRole: val })
+                      }
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select Role" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="USER">All Users</SelectItem>
+                        <SelectItem value="ADMIN">Admins Only</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <div className="flex flex-col gap-2">
+                <Button type="submit" className="w-full gap-2">
+                  <Save className="h-4 w-4" />
+                  Save Changes
+                </Button>
                 <Button
                   type="button"
-                  variant="ghost"
+                  variant="outline"
+                  className="w-full"
                   onClick={() => setIsEditing(false)}
                 >
                   Cancel
                 </Button>
-                <Button type="submit" className="gap-2">
-                  <Save className="h-4 w-4" />
-                  Save Changes
-                </Button>
               </div>
-            </form>
-          </CardContent>
-        </Card>
+            </div>
+          </div>
+        </form>
       </div>
     );
   }
 
-  // List View
+  // === List View (Table) ===
   return (
     <div className="space-y-6 p-1">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Lessons</h1>
           <p className="text-muted-foreground">
-            Manage your course content and visibility settings.
+            Manage your course content and attached materials.
           </p>
         </div>
         <Button onClick={handleCreate} className="w-full sm:w-auto gap-2">
@@ -312,7 +556,8 @@ export default function LessonsPage() {
               <TableRow>
                 <TableHead className="w-[300px]">Title</TableHead>
                 <TableHead>Category</TableHead>
-                <TableHead>Access Level</TableHead>
+                <TableHead>Resources</TableHead>
+                <TableHead>Access</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -320,10 +565,10 @@ export default function LessonsPage() {
               {lessons.length === 0 ? (
                 <TableRow>
                   <TableCell
-                    colSpan={4}
+                    colSpan={5}
                     className="h-24 text-center text-muted-foreground"
                   >
-                    No lessons found. Click &quot;Add Lesson&quot; to create one.
+                    No lessons found.
                   </TableCell>
                 </TableRow>
               ) : (
@@ -339,15 +584,22 @@ export default function LessonsPage() {
                     </TableCell>
                     <TableCell>{lesson.part}</TableCell>
                     <TableCell>
+                      {lesson.resources && lesson.resources.length > 0 ? (
+                        <Badge variant="secondary">
+                          {lesson.resources.length} item(s)
+                        </Badge>
+                      ) : (
+                        <span className="text-muted-foreground text-xs">-</span>
+                      )}
+                    </TableCell>
+                    <TableCell>
                       <Badge
                         variant={
-                          lesson.minRole === "ADMIN"
-                            ? "destructive"
-                            : "secondary"
+                          lesson.minRole === "ADMIN" ? "destructive" : "outline"
                         }
                         className="capitalize"
                       >
-                        {lesson.minRole === "ADMIN" ? "Admin Only" : "Public"}
+                        {lesson.minRole === "ADMIN" ? "Admin" : "Public"}
                       </Badge>
                     </TableCell>
                     <TableCell className="text-right">
@@ -360,7 +612,6 @@ export default function LessonsPage() {
                           className="h-8 w-8 text-muted-foreground hover:text-foreground"
                         >
                           <Edit2 className="h-4 w-4" />
-                          <span className="sr-only">Edit</span>
                         </Button>
                         <Button
                           variant="ghost"
@@ -369,11 +620,10 @@ export default function LessonsPage() {
                           className="h-8 w-8 text-muted-foreground hover:text-destructive"
                         >
                           <Trash2 className="h-4 w-4" />
-                          <span className="sr-only">Delete</span>
                         </Button>
                       </div>
 
-                      {/* Mobile Actions Dropdown */}
+                      {/* Mobile Actions */}
                       <div className="sm:hidden">
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
@@ -386,16 +636,14 @@ export default function LessonsPage() {
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
-                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
                             <DropdownMenuItem
                               onClick={() => handleEdit(lesson)}
                             >
                               <Edit2 className="mr-2 h-4 w-4" /> Edit
                             </DropdownMenuItem>
-                            <DropdownMenuSeparator />
                             <DropdownMenuItem
                               onClick={() => handleDelete(lesson.id!)}
-                              className="text-destructive focus:text-destructive"
+                              className="text-destructive"
                             >
                               <Trash2 className="mr-2 h-4 w-4" /> Delete
                             </DropdownMenuItem>
