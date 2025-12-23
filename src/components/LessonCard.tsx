@@ -102,7 +102,7 @@ const LessonCard: React.FC<LessonCardProps> = ({
                   {lesson.surahNo}.
                 </span>
               )}
-              {lesson.topicName}
+              {lesson.surahName}
             </h4>
             <div className="flex items-center gap-2 text-xs font-mono text-zinc-600">
               <span>ID: #{lesson.id.toString().padStart(3, "0")}</span>
