@@ -69,6 +69,7 @@ interface Lesson {
   audioUrl: string;
   minRole: "USER" | "ADMIN";
   resources?: Resource[];
+  presentationLink?: string;
 }
 
 export default function LessonsPage() {
@@ -83,6 +84,7 @@ export default function LessonsPage() {
     description: "",
     detailedDescription: "",
     audioUrl: "",
+    presentationLink: "",
     minRole: "USER",
     resources: [],
   });
@@ -122,6 +124,7 @@ export default function LessonsPage() {
       description: "",
       detailedDescription: "",
       audioUrl: "",
+      presentationLink: "",
       minRole: "USER",
       resources: [],
     });
@@ -332,6 +335,26 @@ export default function LessonsPage() {
                         })
                       }
                     />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="presentationLink">
+                      Main Presentation/PDF Link
+                    </Label>
+                    <Input
+                      id="presentationLink"
+                      placeholder="https://.../slides.pdf"
+                      value={editingLesson.presentationLink || ""}
+                      onChange={(e) =>
+                        setEditingLesson({
+                          ...editingLesson,
+                          presentationLink: e.target.value,
+                        })
+                      }
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      This is the main "Presentation/PDF" file linked to this
+                      lesson.
+                    </p>
                   </div>
                 </CardContent>
               </Card>
